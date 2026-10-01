@@ -57,11 +57,11 @@ function Signup() {
 
   return (
     <main className="flex min-h-screen flex-col bg-paper px-5 py-6 sm:px-8 sm:py-8">
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between">
+      <header className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3">
         <Logo />
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2">
           <LanguagePicker />
-          <Link to="/" className="focus-ring rounded-xl px-4 py-3 text-base font-extrabold text-ink hover:bg-muted">{t(lang, "Back to home")}</Link>
+          <Link to="/" className="focus-ring rounded-xl px-2 py-3 text-sm font-extrabold text-ink hover:bg-muted sm:px-4 sm:text-base">{t(lang, "Back to home")}</Link>
         </div>
       </header>
 

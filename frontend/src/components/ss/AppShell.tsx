@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   BookOpen,
+  Ellipsis,
   History,
   Home,
   LineChart,
@@ -15,9 +16,10 @@ import {
   Trophy,
   LogOut,
 } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useApp } from "@/lib/app-state";
 import { LANGUAGES, t } from "@/lib/i18n";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV = [
   { to: "/dashboard", key: "dashboard", icon: Home },
@@ -71,6 +73,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const lang = settings.language;
+  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) void navigate({ to: "/login" });
@@ -134,13 +137,13 @@ export function AppShell({ children }: { children: ReactNode }) {
         </button>
       </aside>
 
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card/90 px-4 py-3 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 border-b border-border bg-card/90 px-3 py-3 backdrop-blur sm:px-4 lg:hidden">
         <Logo />
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex min-w-0 items-center gap-2">
           <LanguagePicker />
           <Link
             to="/emergency"
-            className="focus-ring rounded-full bg-risk-soft px-3 py-1.5 text-sm font-bold text-risk"
+            className="focus-ring flex min-h-11 min-w-0 flex-1 items-center justify-center rounded-full bg-risk-soft px-3 py-1.5 text-center text-sm font-bold text-risk sm:flex-none"
           >
             {t(lang, "Help now")}
           </Link>
@@ -165,20 +168,52 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:py-10">{children}</div>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-card lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
         {NAV.filter((n) => MOBILE.includes(n.to)).map(({ to, key, icon: Icon }) => {
           const active = path.startsWith(to);
           return (
             <Link
               key={to}
               to={to}
-              className={`flex flex-col items-center gap-1 py-2.5 text-xs font-bold ${active ? "text-brand" : "text-inksoft"}`}
+              className={`focus-ring flex min-w-0 flex-col items-center gap-1 px-0.5 py-2.5 text-center text-[11px] font-bold leading-tight ${active ? "text-brand" : "text-inksoft"}`}
             >
               <Icon className="h-6 w-6" />
               {t(lang, key)}
             </Link>
           );
         })}
+        <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              className="focus-ring flex min-w-0 flex-col items-center gap-1 px-0.5 py-2.5 text-center text-[11px] font-bold leading-tight text-inksoft"
+            >
+              <Ellipsis className="h-6 w-6" />
+              {t(lang, "More")}
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle className="text-left">{t(lang, "More")}</SheetTitle>
+            </SheetHeader>
+            <nav className="mt-6 grid gap-2">
+              {NAV.filter((item) => !MOBILE.includes(item.to)).map(({ to, key, icon: Icon }) => {
+                const active = path.startsWith(to);
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    onClick={() => setMoreOpen(false)}
+                    className={`focus-ring flex min-h-12 items-center gap-3 rounded-xl px-3 py-2 font-bold ${active ? "bg-brand-soft text-brand" : "text-inksoft hover:bg-muted hover:text-ink"}`}
+                  >
+                    <Icon className="h-5 w-5 shrink-0" />
+                    {t(lang, key)}
+                  </Link>
+                );
+              })}
+            </nav>
+          </SheetContent>
+        </Sheet>
       </nav>
     </div>
   );
@@ -195,9 +230,9 @@ export function PageHeader({
 }) {
   const { settings } = useApp();
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-ink sm:text-4xl">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <div className="min-w-0">
+        <h1 className="wrap-break-word font-display text-3xl font-semibold text-ink sm:text-4xl">
           {t(settings.language, title)}
         </h1>
         {sub && <p className="mt-2 max-w-2xl text-lg text-inksoft">{t(settings.language, sub)}</p>}

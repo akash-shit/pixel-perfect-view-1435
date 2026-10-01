@@ -111,11 +111,11 @@ function HistoryPage() {
       ) : (
         <ul className="card-soft divide-y divide-border">
           {list.map((h) => (
-            <li key={h.id} className="flex items-center gap-4 p-4">
+            <li key={h.id} className="flex min-w-0 items-center gap-3 p-3 sm:gap-4 sm:p-4">
               <RiskBadge level={h.level} size="sm" />
               <button
                 onClick={() => setOpen(h.id)}
-                className="flex-1 truncate text-left text-ink hover:text-brand"
+                className="min-w-0 flex-1 truncate text-left text-ink hover:text-brand"
               >
                 <span className="mr-2 text-xs font-extrabold uppercase text-inksoft">
                   {t(lang, h.kind)}

@@ -32,7 +32,7 @@ function Dashboard() {
       <h1 className="font-display text-4xl font-semibold text-ink">
         {t(settings.language, "greeting")}
       </h1>
-      <p className="mt-2 text-lg text-inksoft">{t(settings.language, "tagline")}</p>
+      <p className="mt-2 text-lg text-inksoft">{t(settings.language, "welcome to ScamShield")}</p>
 
       <div className="mt-8 grid gap-5 lg:grid-cols-3">
         <section className="card-soft p-6 lg:col-span-2">
@@ -62,7 +62,7 @@ function Dashboard() {
           <div className="text-sm font-extrabold uppercase tracking-wide opacity-80">
             {t(lang, "Your safety score")}
           </div>
-          <div className="font-display text-7xl font-semibold">{score}</div>
+          <div className="font-display text-6xl font-semibold sm:text-7xl">{score}</div>
           <p className="opacity-90">
             {t(lang, "Grows as you check, learn and report. Keep going!")}
           </p>
@@ -71,8 +71,8 @@ function Dashboard() {
 
       <div className="mt-5 grid gap-5 lg:grid-cols-3">
         <section className="card-soft p-6 lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-2xl font-semibold text-ink">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="min-w-0 font-display text-2xl font-semibold text-ink">
               {t(lang, "Recent checks")}
             </h2>
             <Link to="/history" className="font-bold text-brand">
@@ -88,7 +88,7 @@ function Dashboard() {
               {history.slice(0, 5).map((h) => (
                 <li key={h.id} className="flex items-center gap-4 py-3">
                   <RiskBadge level={h.level} size="sm" />
-                  <span className="flex-1 truncate text-ink">{h.input}</span>
+                  <span className="min-w-0 flex-1 truncate text-ink">{h.input}</span>
                   <span className="text-sm text-inksoft">
                     {formatDate(h.createdAt, lang, { dateStyle: "medium" })}
                   </span>

@@ -30,13 +30,13 @@ function Insights() {
   return (
     <AppShell>
       <PageHeader title="insights" sub="Charts use sample community data for this demo, plus your own checks." />
-      <div className="mb-5 grid grid-cols-3 gap-4">
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         {[["Safe", counts["safe"], "text-safe"], ["Suspicious", counts["suspicious"], "text-susp"], ["High risk", counts["high"], "text-risk"]].map(([label, value, color]) => (
           <div key={label as string} className="card-soft p-5"><div className={`font-display text-4xl font-semibold ${color}`}>{formatNumber(Number(value), lang)}</div><div className="font-bold text-inksoft">{t(lang, String(label))}</div></div>
         ))}
       </div>
       <div className="grid gap-5 lg:grid-cols-2">
-        <section className="card-soft p-6">
+        <section className="card-soft min-w-0 p-4 sm:p-6">
           <h2 className="font-display text-xl font-semibold text-ink">{t(lang, "Checks this week")}</h2>
           <div className="mt-4 h-64">
             <ResponsiveContainer>
@@ -51,7 +51,7 @@ function Insights() {
             </ResponsiveContainer>
           </div>
         </section>
-        <section className="card-soft p-6">
+        <section className="card-soft min-w-0 p-4 sm:p-6">
           <h2 className="font-display text-xl font-semibold text-ink">{t(lang, "Most common scam types")}</h2>
           <div className="mt-4 h-64">
             <ResponsiveContainer>

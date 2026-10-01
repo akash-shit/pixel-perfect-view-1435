@@ -54,9 +54,9 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-paper">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5">
         <Logo />
-        <nav className="flex items-center gap-2">
+        <nav className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2">
           <LanguagePicker />
           <Link
             to="/learn"
@@ -66,13 +66,13 @@ function Landing() {
           </Link>
           <Link
             to="/login"
-            className="focus-ring rounded-2xl border-2 border-ink bg-card px-5 py-2.5 font-extrabold text-ink"
+            className="focus-ring rounded-2xl border-2 border-ink bg-card px-3 py-2.5 text-sm font-extrabold text-ink sm:px-5 sm:text-base"
           >
             {t(lang, "Login")}
           </Link>
           <Link
             to="/dashboard"
-            className="focus-ring rounded-2xl bg-ink px-5 py-2.5 font-extrabold text-paper"
+            className="focus-ring rounded-2xl bg-ink px-3 py-2.5 text-sm font-extrabold text-paper sm:px-5 sm:text-base"
           >
             {t(lang, "Open app")}
           </Link>
@@ -84,7 +84,7 @@ function Landing() {
           <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-4 py-1.5 text-sm font-extrabold text-brand">
             <Shield className="h-4 w-4" /> {t(lang, "Pause. Check. Stay Safe.")}
           </span>
-          <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.05] text-ink sm:text-6xl">
+          <h1 className="mt-6 font-display text-4xl font-semibold leading-[1.05] text-ink sm:text-5xl lg:text-6xl">
             {t(lang, "Not sure if that message is real?")}
           </h1>
           <p className="mt-5 text-2xl font-bold text-brand">{t(lang, "Check before you click.")}</p>
@@ -113,7 +113,7 @@ function Landing() {
         </div>
 
         <div className="relative">
-          <div className="absolute -inset-4 -z-0 rotate-2 rounded-[2.5rem] bg-brand-soft" />
+          <div className="absolute -inset-y-4 inset-x-2 z-0 rotate-2 rounded-[2.5rem] bg-brand-soft" />
           <div className="card-soft relative overflow-hidden p-6 shadow-xl">
             <div className="scan-sweep" />
             <div className="text-xs font-extrabold uppercase tracking-wide text-inksoft">
@@ -152,7 +152,7 @@ function Landing() {
           <h2 className="font-display text-4xl font-semibold text-ink">
             {t(lang, "What we can check")}
           </h2>
-          <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {CHECKS.map(({ icon: Icon, label, kind }) => (
               <Link
                 key={kind}

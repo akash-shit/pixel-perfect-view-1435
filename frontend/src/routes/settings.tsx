@@ -70,7 +70,7 @@ function SettingsPage() {
       <section className="card-soft mt-5 divide-y divide-border p-2">
         {toggles.map(([k, label, desc]) => (
           <label key={k} className="flex cursor-pointer items-center justify-between gap-4 p-4">
-            <span>
+            <span className="min-w-0">
               <span className="block text-lg font-extrabold text-ink">{t(lang, label)}</span>
               <span className="text-inksoft">{t(lang, desc)}</span>
             </span>

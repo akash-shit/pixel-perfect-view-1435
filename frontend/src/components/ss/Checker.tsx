@@ -52,7 +52,7 @@ export function Checker({ initialKind = "message" }: { initialKind?: CheckKind }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <div className="flex flex-wrap gap-2" role="tablist">
         {KINDS.map(({ kind: k, label, icon: Icon }) => (
           <button
@@ -76,9 +76,9 @@ export function Checker({ initialKind = "message" }: { initialKind?: CheckKind }
       <div className="card-soft relative overflow-hidden p-5 sm:p-6">
         {scanning && <div className="scan-sweep pointer-events-none absolute inset-0" />}
         {kind === "screenshot" && (
-          <label className="mb-4 flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/50 p-6 text-center font-bold text-inksoft hover:border-brand">
+            <label className="mb-4 flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/50 p-6 text-center font-bold text-inksoft hover:border-brand">
             <ImageIcon className="h-8 w-8 text-brand" />
-            {fileName ? t(lang, "Added: {name}", { name: fileName }) : t(lang, "Tap to add a screenshot (stays on your device)")}
+            {fileName ? <span className="max-w-full break-all">{t(lang, "Added: {name}", { name: fileName })}</span> : t(lang, "Tap to add a screenshot (stays on your device)")}
             <input
               type="file"
               accept="image/*"

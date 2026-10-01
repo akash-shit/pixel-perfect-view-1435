@@ -34,10 +34,10 @@ function Learn() {
         title="Learn the tricks"
         sub="Once you know how a scam works, it stops working on you."
       />
-      <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
-        <ul className="flex gap-2 overflow-x-auto lg:flex-col">
+      <div className="grid min-w-0 gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <ul className="flex min-w-0 gap-2 overflow-x-auto lg:flex-col">
           {SCAM_GUIDES.map((s) => (
-            <li key={s.slug}>
+            <li key={s.slug} className="shrink-0 lg:shrink">
               <button
                 onClick={() => setOpen(s.slug)}
                 className={`focus-ring flex w-full items-center gap-3 whitespace-nowrap rounded-2xl px-4 py-3 text-left font-extrabold ${open === s.slug ? "bg-brand text-primary-foreground" : "bg-card text-ink"}`}

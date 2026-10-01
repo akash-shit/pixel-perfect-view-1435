@@ -48,10 +48,10 @@ export function ResultView({ result }: { result: AnalysisResult }) {
     <div className="animate-rise space-y-5">
       <section className={`card-soft flex flex-col gap-6 p-6 sm:flex-row sm:items-center ${m.soft}`}>
         <ScoreRing score={result.score} level={result.level} />
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <RiskBadge level={result.level} size="lg" />
-          <h2 className="mt-3 font-display text-3xl font-semibold text-ink">{t(lang, result.headline)}</h2>
-          <p className="mt-2 text-lg text-ink">{t(lang, result.summary)}</p>
+          <h2 className="mt-3 wrap-break-word font-display text-3xl font-semibold text-ink">{t(lang, result.headline)}</h2>
+          <p className="mt-2 wrap-break-word text-lg text-ink">{t(lang, result.summary)}</p>
         </div>
       </section>
 
@@ -104,9 +104,9 @@ export function ResultView({ result }: { result: AnalysisResult }) {
             const Icon = s.severity === "ok" ? CheckCircle2 : s.severity === "warn" ? AlertTriangle : XCircle;
             const c = s.severity === "ok" ? "text-safe" : s.severity === "warn" ? "text-susp" : "text-risk";
             return (
-              <div key={i} className="flex gap-3 rounded-2xl border border-border p-4">
+              <div key={i} className="flex min-w-0 gap-3 rounded-2xl border border-border p-4">
                 <Icon className={`h-6 w-6 shrink-0 ${c}`} />
-                <div>
+                <div className="min-w-0 wrap-break-word">
                   <div className="text-xs font-extrabold uppercase tracking-wide text-inksoft">{t(lang, s.category)}</div>
                   <div className="font-extrabold text-ink">{t(lang, s.title)}</div>
                   <p className="mt-1 text-sm text-inksoft">{t(lang, s.explanation)}</p>

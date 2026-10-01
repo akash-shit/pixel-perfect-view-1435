@@ -33,7 +33,7 @@ function Emergency() {
   return (
     <AppShell>
       <PageHeader title="It's okay. Let's fix this together." sub="Follow these steps in order." />
-      <a href="tel:1930" className="flex items-center justify-center gap-3 rounded-3xl bg-risk py-6 text-2xl font-extrabold text-primary-foreground shadow-md">
+      <a href="tel:1930" className="flex min-h-16 items-center justify-center gap-3 rounded-3xl bg-risk px-4 py-5 text-center text-xl font-extrabold text-primary-foreground shadow-md sm:text-2xl">
         <Phone className="h-7 w-7" /> {t(lang, "Call 1930 now")}
       </a>
       <ol className="card-soft mt-5 space-y-4 p-6">

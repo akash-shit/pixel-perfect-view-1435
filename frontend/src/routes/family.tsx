@@ -93,13 +93,11 @@ function Family() {
             <li className="text-lg text-inksoft">{t(lang, "No trusted people saved yet.")}</li>
           )}
           {contacts.map((c) => (
-            <li key={c.id} className="card-soft p-5">
-              <div className="flex items-start justify-between">
-                <div>
+            <li key={c.id} className="card-soft min-w-0 p-5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 wrap-break-word">
                   <div className="text-xl font-extrabold text-ink">{c.name}</div>
-                  <div className="text-inksoft">
-                    {t(lang, c.relation)} · {c.phone}
-                  </div>
+                  <div className="text-inksoft">{t(lang, c.relation)} · <span className="wrap-anywhere">{c.phone}</span></div>
                 </div>
                 <div className="flex gap-1">
                   <button

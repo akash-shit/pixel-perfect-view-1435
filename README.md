@@ -167,7 +167,7 @@ The interface is designed with accessibility and simplicity in mind:
 🏗️ Architecture
 
 The project uses a separate frontend and backend architecture.
-
+```
 ScamShield
 │
 ├── frontend/
@@ -184,7 +184,7 @@ ScamShield
     ├── Mongoose
     ├── JWT Authentication
     └── Scam Detection Engine
-
+```
 Request Flow
 
                     User
@@ -385,7 +385,7 @@ Expected response:
 ⸻
 
 📁 Project Structure
-
+```
 pixel-perfect-view-1435/
 │
 ├── frontend/
@@ -415,7 +415,7 @@ pixel-perfect-view-1435/
 │
 ├── .gitignore
 └── README.md
-
+```
 ⸻
 
 🔒 Environment Variables

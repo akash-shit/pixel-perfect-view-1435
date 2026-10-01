@@ -22,16 +22,17 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function Dashboard() {
-  const { settings, history, quizScore, reports } = useApp();
+  const { user, settings, history, quizScore, reports } = useApp();
   const lang = settings.language;
+  const greeting = user?.name
+    ? t(lang, "greetingWithName", { name: user.name })
+    : t(lang, "greeting");
   const score = safetyScore(history, quizScore, reports.length);
   const elder = settings.mode === "elder";
 
   return (
     <AppShell>
-      <h1 className="font-display text-4xl font-semibold text-ink">
-        {t(settings.language, "greeting")}
-      </h1>
+      <h1 className="wrap-anywhere font-display text-4xl font-semibold text-ink">{greeting}</h1>
       <p className="mt-2 text-lg text-inksoft">{t(settings.language, "welcome to ScamShield")}</p>
 
       <div className="mt-8 grid gap-5 lg:grid-cols-3">

@@ -7,6 +7,7 @@ const en: Record<string, string> = {
   checkPhone: "Check Phone Number", checkQr: "Check QR Code", checkEmail: "Check Email",
   checkScreenshot: "Check Screenshot", analyze: "Analyze", clear: "Clear", example: "Example",
   whatToCheck: "What would you like to check?", greeting: "Hello 👋",
+  greetingWithName: "Hello, {name} 👋",
   greetingSub: "Stay safe, one message at a time.",
   disclaimer: "Rule-based Risk Score, not a calibrated probability. Verify important information independently.",
 };
@@ -18,6 +19,7 @@ const hi: Record<string, string> = {
   checkPhone: "फ़ोन नंबर जाँचें", checkQr: "QR कोड जाँचें", checkEmail: "ईमेल जाँचें",
   checkScreenshot: "स्क्रीनशॉट जाँचें", analyze: "जाँच करें", clear: "मिटाएँ", example: "उदाहरण",
   whatToCheck: "आप क्या जाँचना चाहते हैं?", greeting: "नमस्ते 👋",
+  greetingWithName: "नमस्ते, {name} 👋",
   greetingSub: "एक-एक संदेश जाँचकर सुरक्षित रहें।",
   disclaimer: "नियम-आधारित जोखिम स्कोर, प्रमाणित संभावना नहीं। महत्वपूर्ण जानकारी की अलग से पुष्टि करें।",
   "Pause. Check. Stay Safe.": "रुकें। जाँचें। सुरक्षित रहें।",
@@ -269,6 +271,7 @@ const bn: Record<string, string> = {
   checkPhone: "ফোন নম্বর যাচাই", checkQr: "QR কোড যাচাই", checkEmail: "ইমেল যাচাই",
   checkScreenshot: "স্ক্রিনশট যাচাই", analyze: "যাচাই করুন", clear: "মুছুন", example: "উদাহরণ",
   whatToCheck: "আপনি কী যাচাই করতে চান?", greeting: "নমস্কার 👋",
+  greetingWithName: "নমস্কার, {name} 👋",
   greetingSub: "একটি একটি বার্তা যাচাই করে নিরাপদ থাকুন।",
   disclaimer: "নিয়ম-ভিত্তিক ঝুঁকি স্কোর, বৈজ্ঞানিক সম্ভাবনা নয়। গুরুত্বপূর্ণ তথ্য নিজে যাচাই করুন।",
   "Pause. Check. Stay Safe.": "থামুন। যাচাই করুন। নিরাপদ থাকুন।",

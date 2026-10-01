@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AlertsRouteImport } from './routes/alerts'
+import { Route as CheckRouteImport } from './routes/check'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as FamilyRouteImport } from './routes/family'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as LearnRouteImport } from './routes/learn'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as ReportRouteImport } from './routes/report'
+import { Route as SettingsRouteImport } from './routes/settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlertsRoute = AlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckRoute = CheckRouteImport.update({
+  id: '/check',
+  path: '/check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FamilyRoute = FamilyRouteImport.update({
+  id: '/family',
+  path: '/family',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
+  '/check': typeof CheckRoute
+  '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
+  '/family': typeof FamilyRoute
+  '/history': typeof HistoryRoute
+  '/insights': typeof InsightsRoute
+  '/learn': typeof LearnRoute
+  '/quiz': typeof QuizRoute
+  '/report': typeof ReportRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
+  '/check': typeof CheckRoute
+  '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
+  '/family': typeof FamilyRoute
+  '/history': typeof HistoryRoute
+  '/insights': typeof InsightsRoute
+  '/learn': typeof LearnRoute
+  '/quiz': typeof QuizRoute
+  '/report': typeof ReportRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
+  '/check': typeof CheckRoute
+  '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
+  '/family': typeof FamilyRoute
+  '/history': typeof HistoryRoute
+  '/insights': typeof InsightsRoute
+  '/learn': typeof LearnRoute
+  '/quiz': typeof QuizRoute
+  '/report': typeof ReportRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/alerts'
+    | '/check'
+    | '/dashboard'
+    | '/emergency'
+    | '/family'
+    | '/history'
+    | '/insights'
+    | '/learn'
+    | '/quiz'
+    | '/report'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/alerts'
+    | '/check'
+    | '/dashboard'
+    | '/emergency'
+    | '/family'
+    | '/history'
+    | '/insights'
+    | '/learn'
+    | '/quiz'
+    | '/report'
+    | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/alerts'
+    | '/check'
+    | '/dashboard'
+    | '/emergency'
+    | '/family'
+    | '/history'
+    | '/insights'
+    | '/learn'
+    | '/quiz'
+    | '/report'
+    | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlertsRoute: typeof AlertsRoute
+  CheckRoute: typeof CheckRoute
+  DashboardRoute: typeof DashboardRoute
+  EmergencyRoute: typeof EmergencyRoute
+  FamilyRoute: typeof FamilyRoute
+  HistoryRoute: typeof HistoryRoute
+  InsightsRoute: typeof InsightsRoute
+  LearnRoute: typeof LearnRoute
+  QuizRoute: typeof QuizRoute
+  ReportRoute: typeof ReportRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alerts': {
+      id: '/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/check': {
+      id: '/check'
+      path: '/check'
+      fullPath: '/check'
+      preLoaderRoute: typeof CheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/family': {
+      id: '/family'
+      path: '/family'
+      fullPath: '/family'
+      preLoaderRoute: typeof FamilyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlertsRoute: AlertsRoute,
+  CheckRoute: CheckRoute,
+  DashboardRoute: DashboardRoute,
+  EmergencyRoute: EmergencyRoute,
+  FamilyRoute: FamilyRoute,
+  HistoryRoute: HistoryRoute,
+  InsightsRoute: InsightsRoute,
+  LearnRoute: LearnRoute,
+  QuizRoute: QuizRoute,
+  ReportRoute: ReportRoute,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

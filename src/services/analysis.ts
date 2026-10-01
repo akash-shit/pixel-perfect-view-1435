@@ -166,7 +166,7 @@ export function analyseText(
     score += 24;
     reasons.push("Promises a prize, reward or easy money");
     highlights.push({
-      phrase: rewards[0],
+      phrase: rewards[0] ?? "prize",
       why: "Unexpected winnings are one of the most common scam hooks.",
     });
     signals.push({
@@ -183,7 +183,7 @@ export function analyseText(
     signals.push({
       category: "Sender",
       severity: urgency.length || credentials.length ? "warn" : "ok",
-      title: `Claims to be ${brands[0].toUpperCase()}`,
+      title: `Claims to be ${(brands[0] ?? "").toUpperCase()}`,
       explanation:
         "Organisation names are easy to fake. Contact them using the number printed on their official app or website instead.",
     });

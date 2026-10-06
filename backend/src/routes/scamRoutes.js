@@ -11,9 +11,9 @@ router.use(requireAuth);
 router.post(
   "/analyze",
   analysisRateLimit,
-  body("type").isIn(["message", "link", "phone"]).withMessage("Choose a message, link, or phone check."),
+  body("type").optional().isIn(["message", "link", "phone", "url"]).withMessage("Choose a message, link, phone, or URL check."),
   body("content").isString().trim().notEmpty().withMessage("Enter something to check.").isLength({ max: 5000 }).withMessage("Checks must be 5,000 characters or fewer."),
-  body("displayType").optional().isIn(["message", "link", "phone", "email", "qr", "screenshot"]).withMessage("This check type is not supported."),
+  body("displayType").optional().isIn(["message", "link", "phone", "email", "qr", "screenshot", "url"]).withMessage("This check type is not supported."),
   validateRequest,
   analyze,
 );

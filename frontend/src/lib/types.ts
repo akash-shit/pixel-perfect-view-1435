@@ -38,6 +38,32 @@ export interface AnalysisResult {
   highlights: Highlight[];
   actions: string[];
   language: "en" | "hi" | "bn";
+  analysisMethod?: "ai" | "rule-based-fallback";
+  riskLabel?: string;
+  verdict?: string;
+  confidence?: number;
+  extracted?: ScreenshotAnalysis["extracted"];
+  disclaimer?: string;
+}
+
+export interface ScreenshotAnalysis {
+  id: string;
+  createdAt: string;
+  riskScore: number;
+  riskLevel: "LOW RISK" | "SUSPICIOUS" | "HIGH RISK";
+  confidence: number;
+  summary: string;
+  extracted: {
+    text: string;
+    urls: string[];
+    phoneNumbers: string[];
+    emails: string[];
+    upiIds: string[];
+  };
+  indicators: Array<{ type: string; severity: "low" | "medium" | "high"; description: string }>;
+  recommendations: string[];
+  disclaimer: string;
+  analysisMethod: "ai" | "rule-based-fallback";
 }
 
 export type AppMode = "personal" | "elder" | "family";

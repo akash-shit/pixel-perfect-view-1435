@@ -8,7 +8,7 @@ import { formatNumber, t } from "@/lib/i18n";
 export const Route = createFileRoute("/quiz")({
   head: () => ({
     meta: [
-      { title: "Spot the scam quiz — ScamShield" },
+      { title: "ScamShield" },
       { name: "description", content: "Five real-life situations. Can you spot the scam?" },
       { property: "og:title", content: "Spot the scam quiz — ScamShield" },
       { property: "og:description", content: "Test your scam-spotting skills in two minutes." },

@@ -9,7 +9,7 @@ import type { AppMode } from "@/lib/types";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — ScamShield" },
+      { title: "ScamShield" },
       {
         name: "description",
         content: "Elder mode, larger text, high contrast, language and privacy settings.",

@@ -9,7 +9,7 @@ import { t } from "@/lib/i18n";
 export const Route = createFileRoute("/family")({
   head: () => ({
     meta: [
-      { title: "Family protection — ScamShield" },
+      { title: "ScamShield" },
       {
         name: "description",
         content: "Keep trusted contacts one tap away and ask them before you act.",

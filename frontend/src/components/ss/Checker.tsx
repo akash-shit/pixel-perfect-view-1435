@@ -1,4 +1,4 @@
-import { Link as LinkIcon, Mail, MessageSquare, Phone, QrCode, Image as ImageIcon, Loader2, Check } from "lucide-react";
+import { Image as ImageIcon, Link as LinkIcon, Mail, MessageSquare, Phone, QrCode, Loader2, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApp } from "@/lib/app-state";
@@ -7,14 +7,15 @@ import type { AnalysisResult, CheckKind } from "@/lib/types";
 import { EXAMPLES, SCAN_STAGES } from "@/services/analysis";
 import { analyzeScam } from "@/services/api";
 import { ResultView } from "./ResultView";
+import { ScreenshotChecker } from "./ScreenshotChecker";
 
 export const KINDS: { kind: CheckKind; label: string; icon: typeof Phone; placeholder: string }[] = [
   { kind: "message", label: "Message", icon: MessageSquare, placeholder: "Paste the SMS, WhatsApp or Telegram message here…" },
   { kind: "link", label: "Link", icon: LinkIcon, placeholder: "Paste the web address, e.g. https://…" },
-  { kind: "phone", label: "Phone number", icon: Phone, placeholder: "Enter the number that called you" },
+  { kind: "phone", label: "Phone Number", icon: Phone, placeholder: "Enter the number that called you" },
   { kind: "email", label: "Email", icon: Mail, placeholder: "Paste the email, including the sender address" },
-  { kind: "qr", label: "QR / UPI", icon: QrCode, placeholder: "Paste the UPI link or the text from the QR code" },
-  { kind: "screenshot", label: "Screenshot", icon: ImageIcon, placeholder: "Type the text you see in the screenshot" },
+  { kind: "qr", label: "UPI ID", icon: QrCode, placeholder: "Paste the UPI link or the text from the QR code" },
+  { kind: "screenshot", label: "Screenshot", icon: ImageIcon, placeholder: "Upload a screenshot to check" },
 ];
 
 export function Checker({ initialKind = "message" }: { initialKind?: CheckKind }) {
@@ -24,7 +25,6 @@ export function Checker({ initialKind = "message" }: { initialKind?: CheckKind }
   const [input, setInput] = useState("");
   const [stage, setStage] = useState(-1);
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
 
   useEffect(() => setKind(initialKind), [initialKind]);
 
@@ -73,20 +73,12 @@ export function Checker({ initialKind = "message" }: { initialKind?: CheckKind }
         ))}
       </div>
 
+      {kind === "screenshot" ? (
+        <ScreenshotChecker />
+      ) : (
+      <>
       <div className="card-soft relative overflow-hidden p-5 sm:p-6">
         {scanning && <div className="scan-sweep pointer-events-none absolute inset-0" />}
-        {kind === "screenshot" && (
-            <label className="mb-4 flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/50 p-6 text-center font-bold text-inksoft hover:border-brand">
-            <ImageIcon className="h-8 w-8 text-brand" />
-            {fileName ? <span className="max-w-full break-all">{t(lang, "Added: {name}", { name: fileName })}</span> : t(lang, "Tap to add a screenshot (stays on your device)")}
-            <input
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
-            />
-          </label>
-        )}
         {kind === "phone" || kind === "link" ? (
           <input
             value={input}
@@ -151,6 +143,8 @@ export function Checker({ initialKind = "message" }: { initialKind?: CheckKind }
       )}
 
       {result && <ResultView result={result} />}
+      </>
+      )}
     </div>
   );
 }

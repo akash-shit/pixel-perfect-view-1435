@@ -12,7 +12,7 @@ import type { RiskLevel } from "@/lib/types";
 export const Route = createFileRoute("/history")({
   head: () => ({
     meta: [
-      { title: "Your check history — ScamShield" },
+      { title: "ScamShield" },
       {
         name: "description",
         content: "Every message, link and number you checked, saved privately on this device.",

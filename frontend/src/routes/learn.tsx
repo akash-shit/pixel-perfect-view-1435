@@ -8,13 +8,13 @@ import { t } from "@/lib/i18n";
 export const Route = createFileRoute("/learn")({
   head: () => ({
     meta: [
-      { title: "Learn common scams — ScamShield" },
+      { title: "ScamShield" },
       {
         name: "description",
         content:
           "Simple guides to KYC, UPI, lottery, delivery, job and deepfake scams — and what to do.",
       },
-      { property: "og:title", content: "Learn common scams — ScamShield" },
+      { property: "og:title", content: "ScamShield" },
       { property: "og:description", content: "Plain-language guides to the scams going around." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },

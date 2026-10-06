@@ -21,7 +21,7 @@ import { t } from "@/lib/i18n";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ScamShield — Check before you click" },
+      { title: "ScamShield" },
       {
         name: "description",
         content:

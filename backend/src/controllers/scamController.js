@@ -1,27 +1,53 @@
 import mongoose from "mongoose";
 import { ScamCheck } from "../models/ScamCheck.js";
-import { analyzeScam, redactSensitiveInput } from "../services/scamDetectionService.js";
+import { analyzeScamRequest } from "../services/scamAnalyzer.js";
+import { redactSensitiveInput } from "../services/scamDetectionService.js";
 
 export async function analyze(req, res) {
-  const { type, content, displayType } = req.body;
-  const result = analyzeScam(content, type, displayType || type);
+  const { type, content, displayType, language } = req.body;
+  const requestedType = type === "url" ? "url" : type || "message";
+  const result = await analyzeScamRequest({
+    content,
+    type: requestedType,
+    displayType: displayType || requestedType,
+    language: language || "en",
+  });
+
   const safeInput = redactSensitiveInput(content).slice(0, 5000);
   const check = await ScamCheck.create({
     userId: req.user.id,
-    type,
-    displayType: displayType || type,
+    type: requestedType === "url" ? "link" : requestedType,
+    displayType: displayType || requestedType,
     input: safeInput,
-    ...result,
+    riskScore: result.riskScore,
+    riskLevel: result.riskLevel,
+    summary: result.summary,
+    verdict: result.verdict,
+    signals: result.signals,
+    urlAnalysis: result.urlAnalysis,
+    recommendedActions: result.recommendedActions,
+    matchedSignals: result.matchedSignals,
+    shouldClick: result.shouldClick,
+    shouldShareSensitiveInformation: result.shouldShareSensitiveInformation,
+    shouldContactTrustedPerson: result.shouldContactTrustedPerson,
+    verificationSteps: result.verificationSteps,
+    limitations: result.limitations,
+    analysisMethod: result.analysisMethod,
+    confidence: result.confidence,
+    reasons: result.reasons,
   });
 
   return res.status(201).json({
     success: true,
     id: check._id.toString(),
-    type,
-    displayType: displayType || type,
+    type: requestedType,
+    displayType: displayType || requestedType,
     input: safeInput,
     createdAt: check.createdAt,
     ...result,
+    riskLevel: result.riskLevel,
+    riskLabel: result.riskLabel,
+    analysisMethod: result.analysisMethod,
   });
 }
 
@@ -36,9 +62,21 @@ export async function getHistory(req, res) {
       input: check.input,
       riskScore: check.riskScore,
       riskLevel: check.riskLevel,
+      riskLabel: check.riskLabel,
+      verdict: check.verdict,
+      summary: check.summary,
       reasons: check.reasons,
       recommendedActions: check.recommendedActions,
       matchedSignals: check.matchedSignals,
+      signals: check.signals || [],
+      urlAnalysis: check.urlAnalysis || [],
+      shouldClick: check.shouldClick,
+      shouldShareSensitiveInformation: check.shouldShareSensitiveInformation,
+      shouldContactTrustedPerson: check.shouldContactTrustedPerson,
+      verificationSteps: check.verificationSteps || [],
+      limitations: check.limitations || [],
+      analysisMethod: check.analysisMethod,
+      confidence: check.confidence,
       createdAt: check.createdAt,
     })),
   });

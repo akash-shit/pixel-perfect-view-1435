@@ -8,7 +8,7 @@ import { formatNumber, t } from "@/lib/i18n";
 export const Route = createFileRoute("/insights")({
   head: () => ({
     meta: [
-      { title: "Insights — ScamShield" },
+      { title: "ScamShield" },
       { name: "description", content: "See how many scams you've caught and which types are most common." },
       { property: "og:title", content: "Insights — ScamShield" },
       { property: "og:description", content: "Your scam-checking activity at a glance." },

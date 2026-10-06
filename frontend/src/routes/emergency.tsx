@@ -7,7 +7,7 @@ import { t } from "@/lib/i18n";
 export const Route = createFileRoute("/emergency")({
   head: () => ({
     meta: [
-      { title: "I think I was scammed — ScamShield" },
+      { title: "ScamShield" },
       { name: "description", content: "Calm, step-by-step help if you shared an OTP, paid money or clicked a scam link." },
       { property: "og:title", content: "I think I was scammed — ScamShield" },
       { property: "og:description", content: "What to do right now, step by step." },

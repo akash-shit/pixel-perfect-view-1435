@@ -2,6 +2,7 @@ import type {
   AnalysisResult,
   CheckKind,
   SignalCategory,
+  ScreenshotAnalysis,
   TrustedContact,
   UiLanguage,
 } from "@/lib/types";
@@ -140,14 +141,21 @@ export async function deleteTrustedContact(id: string): Promise<void> {
 
 interface ServerCheck {
   id: string;
-  type: "message" | "link" | "phone";
+  type: "message" | "link" | "phone" | "url";
   displayType?: CheckKind;
   input: string;
   riskScore: number;
   riskLevel: "low" | "suspicious" | "high" | "very_high";
+  riskLabel?: string;
+  verdict?: string;
+  summary?: string;
   reasons: string[];
   recommendedActions: string[];
   matchedSignals: string[];
+  analysisMethod?: "ai" | "rule-based-fallback";
+  signals?: Array<{ type: string; severity: "low" | "medium" | "high"; explanation: string }>;
+  urlAnalysis?: Array<{ url: string; domain: string; suspicious: boolean; reasons: string[] }>;
+  confidence?: number;
   createdAt: string;
 }
 
@@ -220,23 +228,37 @@ const SIGNAL_DETAILS: Record<
 function fromServerCheck(check: ServerCheck, language: UiLanguage): AnalysisResult {
   const level =
     check.riskLevel === "low" ? "safe" : check.riskLevel === "suspicious" ? "suspicious" : "high";
-  const signals = check.matchedSignals.map((matchedSignal) => {
-    const details = SIGNAL_DETAILS[matchedSignal];
-    return {
-      category: details?.category || "Context",
-      severity:
-        level === "safe"
-          ? ("ok" as const)
-          : level === "suspicious"
-            ? ("warn" as const)
-            : ("critical" as const),
-      title: details?.title || "A warning signal was found",
-      explanation:
-        details?.explanation || "Review this signal and verify the message independently.",
-    };
-  });
-  if (signals.length === 0) {
-    signals.push({
+
+  const normalizedSignals = Array.isArray(check.signals) && check.signals.length > 0
+    ? check.signals.map((signal) => ({
+        category: SIGNAL_DETAILS[signal.type]?.category || "Context",
+        severity:
+          signal.severity === "high"
+            ? ("critical" as const)
+            : signal.severity === "medium"
+              ? ("warn" as const)
+              : ("ok" as const),
+        title: SIGNAL_DETAILS[signal.type]?.title || signal.type || "A warning signal was found",
+        explanation: signal.explanation || SIGNAL_DETAILS[signal.type]?.explanation || "Review this signal and verify the message independently.",
+      }))
+    : check.matchedSignals.map((matchedSignal) => {
+        const details = SIGNAL_DETAILS[matchedSignal];
+        return {
+          category: details?.category || "Context",
+          severity:
+            level === "safe"
+              ? ("ok" as const)
+              : level === "suspicious"
+                ? ("warn" as const)
+                : ("critical" as const),
+          title: details?.title || "A warning signal was found",
+          explanation:
+            details?.explanation || "Review this signal and verify the message independently.",
+        };
+      });
+
+  if (normalizedSignals.length === 0) {
+    normalizedSignals.push({
       category: "Context",
       severity: "ok",
       title: "No configured warning signals matched",
@@ -246,13 +268,14 @@ function fromServerCheck(check: ServerCheck, language: UiLanguage): AnalysisResu
   }
 
   const headline =
-    check.riskLevel === "very_high"
+    check.verdict ||
+    (check.riskLevel === "very_high"
       ? "Several strong warning signs found"
       : check.riskLevel === "high"
         ? "High risk warning signs found"
         : check.riskLevel === "suspicious"
           ? "Some warning signs found"
-          : "No strong warning signs found";
+          : "No strong warning signs found");
 
   return {
     id: check.id,
@@ -263,12 +286,16 @@ function fromServerCheck(check: ServerCheck, language: UiLanguage): AnalysisResu
     score: check.riskScore,
     headline,
     summary:
+      check.summary ||
       "This Risk Score comes from configurable rules. It is not a scientifically calibrated probability; verify important information independently.",
     reasons: check.reasons,
-    signals,
+    signals: normalizedSignals,
     highlights: [],
     actions: check.recommendedActions,
     language,
+    analysisMethod: check.analysisMethod || "rule-based-fallback",
+    riskLabel: check.riskLabel || check.riskLevel,
+    verdict: check.verdict,
   };
 }
 
@@ -277,12 +304,73 @@ export async function analyzeScam(
   kind: CheckKind,
   language: UiLanguage,
 ): Promise<AnalysisResult> {
-  const type = kind === "link" || kind === "phone" ? kind : "message";
+  if (kind === "phone") {
+    const result = await request<{
+      success: true;
+      phone: string;
+      riskScore: number;
+      status: "LOW RISK" | "SUSPICIOUS" | "HIGH RISK";
+      reasons: string[];
+    }>("/phone/check", jsonBody({ phone: content }));
+    const level = result.status === "LOW RISK" ? "safe" : result.status === "SUSPICIOUS" ? "suspicious" : "high";
+
+    return {
+      id: `phone-${Date.now()}`,
+      kind,
+      input: result.phone,
+      createdAt: new Date().toISOString(),
+      level,
+      score: result.riskScore,
+      headline: result.status,
+      summary: "Automated risk assessment only. This does not guarantee that the number is safe or identify who is calling.",
+      reasons: result.reasons,
+      signals: result.reasons.map((reason) => ({
+        category: "Sender" as const,
+        severity: level === "safe" ? ("ok" as const) : level === "suspicious" ? ("warn" as const) : ("critical" as const),
+        title: reason,
+        explanation: reason,
+      })),
+      highlights: [],
+      actions: [
+        "Verify the caller using contact details from an official source.",
+        "Do not share an OTP, PIN, password, or banking details over a call.",
+        "Ask someone you trust before sending money or acting under pressure.",
+      ],
+      language,
+      analysisMethod: "rule-based-fallback",
+      riskLabel: result.status,
+    };
+  }
+
+  const type = kind === "link" ? kind : "message";
   const result = await request<ServerCheck>(
     "/scam/analyze",
     jsonBody({ type, content, displayType: kind }),
   );
   return fromServerCheck(result, language);
+}
+
+export async function analyzeScreenshot(file: File, language: UiLanguage): Promise<ScreenshotAnalysis> {
+  const formData = new FormData();
+  formData.append("screenshot", file, file.name);
+  formData.append("language", language);
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/screenshot/analyze`, {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+  } catch {
+    throw new ApiError("Cannot reach ScamShield right now. Check your connection and try again.", 0);
+  }
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new ApiError(payload.message || "We could not analyze this screenshot.", response.status);
+  }
+  return payload as ScreenshotAnalysis;
 }
 
 export async function getScamHistory(language: UiLanguage): Promise<AnalysisResult[]> {

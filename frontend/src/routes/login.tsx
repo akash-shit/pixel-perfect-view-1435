@@ -8,7 +8,7 @@ import { t } from "@/lib/i18n";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Login — ScamShield" },
+      { title: "ScamShield" },
       { name: "description", content: "Sign in to continue to your Scam Safety Assistant." },
     ],
   }),

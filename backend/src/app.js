@@ -5,7 +5,9 @@ import express from "express";
 import helmet from "helmet";
 import authRoutes from "./routes/authRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import phoneCheckRoutes from "./routes/phoneCheck.js";
 import scamRoutes from "./routes/scamRoutes.js";
+import screenshotRoutes from "./routes/screenshotRoutes.js";
 import { errorMiddleware, notFoundMiddleware } from "./middleware/errorMiddleware.js";
 
 const app = express();
@@ -32,7 +34,9 @@ app.get("/api/health", (_req, res) => {
 });
 app.use("/api/auth", authRoutes);
 app.use("/api/contacts", contactRoutes);
+app.use("/api/phone", phoneCheckRoutes);
 app.use("/api/scam", scamRoutes);
+app.use("/api/screenshot", screenshotRoutes);
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 

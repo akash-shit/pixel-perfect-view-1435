@@ -10,7 +10,7 @@ import { formatDate, t } from "@/lib/i18n";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Home — ScamShield" },
+      { title: "ScamShield" },
       { name: "description", content: "Your safety score, recent checks and today's scam alerts." },
       { property: "og:title", content: "Home — ScamShield" },
       { property: "og:description", content: "Your personal scam-safety dashboard." },

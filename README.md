@@ -148,6 +148,8 @@ ScamShield supports multiple languages to make the application easier to use for
 
 The selected language is preserved across navigation and application sessions.
 
+The floating voice assistant is available across the app and supports English, Hindi, and Bengali conversations. It can answer questions about ScamShield features, link to relevant pages, and provide emergency guidance. AI responses use the backend-only AI provider configuration. Voice input records locally and uses the backend's local faster-whisper model for English, Hindi, and Bengali; read-aloud uses installed browser voices. See the backend README for one-time setup.
+
 ⸻
 
 👴 Elder-Friendly Design

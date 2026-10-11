@@ -15,3 +15,23 @@ export const analysisRateLimit = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: "Too many checks. Please wait a moment and try again." },
 });
+
+export const assistantRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 12,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many assistant questions. Please wait a moment and try again." },
+});
+
+export const assistantTranscriptionRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 12,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    code: "STT_REQUEST_LIMITED",
+    message: "Too many voice transcription requests. Please wait a moment and try again.",
+  },
+});

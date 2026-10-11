@@ -61,7 +61,7 @@ const DEFAULTS: Settings = {
   largeText: false,
   highContrast: false,
   reduceMotion: false,
-  voice: false,
+  voice: true,
 };
 
 const Ctx = createContext<AppState | null>(null);

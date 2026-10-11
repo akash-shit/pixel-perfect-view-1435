@@ -46,7 +46,7 @@ function SettingsPage() {
     ["largeText", "Larger text", "Makes all words bigger."],
     ["highContrast", "High contrast", "Stronger colours and borders."],
     ["reduceMotion", "Reduce motion", "Turns off moving animations."],
-    ["voice", "Read results aloud", "Coming soon in this demo."],
+    ["voice", "Read results aloud", "Assistant answers are read aloud automatically."],
   ] as const;
 
   return (

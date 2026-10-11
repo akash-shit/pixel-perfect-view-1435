@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppStateProvider } from "../lib/app-state";
 import { AuthProvider } from "../lib/auth-state";
 import { Toaster } from "../components/ui/sonner";
+import { VoiceAssistant } from "../components/ss/VoiceAssistant";
 
 function NotFoundComponent() {
   return (
@@ -130,6 +131,7 @@ function RootComponent() {
       <AuthProvider>
         <AppStateProvider>
           <Outlet />
+          <VoiceAssistant />
           <Toaster position="top-center" />
         </AppStateProvider>
       </AuthProvider>

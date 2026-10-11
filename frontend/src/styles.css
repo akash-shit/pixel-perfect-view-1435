@@ -234,3 +234,419 @@ html.ss-reduce-motion *::after {
     outline-offset: 2px;
   }
 }
+
+/* Voice assistant ---------------------------------------------------- */
+
+.ss-assistant {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.ss-assistant-launcher {
+  position: absolute;
+  right: max(1.5rem, env(safe-area-inset-right));
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  display: grid;
+  width: 3.75rem;
+  height: 3.75rem;
+  place-items: center;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--brand);
+  color: white;
+  box-shadow: 0 8px 24px oklch(0.28 0.03 260 / 0.28);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.ss-assistant-launcher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px oklch(0.28 0.03 260 / 0.34);
+}
+
+.ss-assistant-launcher:focus-visible,
+.ss-assistant-icon-button:focus-visible,
+.ss-assistant-control-button:focus-visible,
+.ss-assistant-audio-control:focus-visible,
+.ss-assistant-suggestions button:focus-visible,
+.ss-assistant-link:focus-visible,
+.ss-assistant-speaker-button:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.ss-assistant-launcher-active {
+  animation: ss-assistant-pulse 1.5s ease-in-out infinite;
+}
+
+.ss-assistant-panel {
+  position: absolute;
+  right: max(1.5rem, env(safe-area-inset-right));
+  bottom: 6.25rem;
+  display: flex;
+  width: min(25rem, calc(100vw - 2rem));
+  max-height: min(43rem, calc(100dvh - 8rem));
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 20px 60px oklch(0.22 0.03 264 / 0.24);
+  pointer-events: auto;
+  animation: ss-assistant-enter 180ms ease-out both;
+}
+
+.ss-assistant-header {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--brand);
+  color: white;
+}
+
+.ss-assistant-avatar {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 1rem;
+  background: oklch(1 0 0 / 0.18);
+}
+
+.ss-assistant-title {
+  overflow: hidden;
+  font-family: var(--font-family-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ss-assistant-status {
+  display: flex;
+  min-height: 1.25rem;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.ss-assistant-speaking-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ss-assistant-speaking-dots i {
+  width: 3px;
+  height: 9px;
+  border-radius: 2px;
+  background: currentColor;
+  animation: ss-assistant-wave 700ms ease-in-out infinite alternate;
+}
+
+.ss-assistant-speaking-dots i:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.ss-assistant-speaking-dots i:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+.ss-assistant-icon-button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 0.85rem;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+.ss-assistant-icon-button:hover {
+  background: oklch(1 0 0 / 0.15);
+}
+
+.ss-assistant-language {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.ss-assistant-language select {
+  min-height: 2.5rem;
+  max-width: 10rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--card);
+  padding: 0.35rem 0.55rem;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.ss-assistant-language select:focus-visible,
+.ss-assistant-input:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.ss-assistant-messages {
+  display: flex;
+  min-height: 12rem;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  padding: 1rem;
+  overscroll-behavior: contain;
+}
+
+.ss-assistant-message {
+  display: flex;
+  max-width: 90%;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ss-assistant-message-bot {
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  background: var(--paper);
+}
+
+.ss-assistant-message-user {
+  align-self: flex-end;
+  background: var(--brand-soft);
+  color: var(--ink);
+}
+
+.ss-assistant-message-content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.ss-assistant-speaker-button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  place-items: center;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  padding: 0;
+  color: var(--brand);
+  cursor: pointer;
+}
+
+.ss-assistant-speaker-button:hover {
+  background: var(--brand-soft);
+}
+
+.ss-assistant-suggestions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ss-assistant-suggestions button,
+.ss-assistant-link {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--card);
+  padding: 0.6rem 0.75rem;
+  color: var(--brand);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ss-assistant-link {
+  width: 100%;
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.ss-assistant-error {
+  border-radius: 0.75rem;
+  background: var(--risk-soft);
+  padding: 0.6rem 0.75rem;
+  color: var(--risk);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.ss-assistant-footer {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 0.45rem;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  padding: 0.75rem;
+}
+
+.ss-assistant-privacy {
+  padding: 0 0.25rem;
+  color: var(--inksoft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.ss-assistant-audio-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ss-assistant-audio-control {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: var(--brand-soft);
+  padding: 0.4rem 0.65rem;
+  color: var(--brand);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ss-assistant-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.ss-assistant-control-button {
+  display: grid;
+  width: 2.9rem;
+  height: 2.9rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.ss-assistant-control-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ss-assistant-mic-active {
+  border-color: var(--risk);
+  background: var(--risk-soft);
+  color: var(--risk);
+  animation: ss-assistant-pulse 1.3s ease-in-out infinite;
+}
+
+.ss-assistant-send:not(:disabled) {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: white;
+}
+
+.ss-assistant-input {
+  width: 100%;
+  min-height: 2.9rem;
+  max-height: 7rem;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: var(--card);
+  padding: 0.7rem;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.ss-assistant-input::placeholder {
+  color: var(--inksoft);
+}
+
+@keyframes ss-assistant-pulse {
+  50% {
+    box-shadow: 0 0 0 7px oklch(0.55 0.19 258 / 0.18);
+  }
+}
+
+@keyframes ss-assistant-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ss-assistant-wave {
+  to {
+    height: 15px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ss-assistant-launcher {
+    right: max(0.8rem, env(safe-area-inset-right));
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+
+  .ss-assistant-panel {
+    right: max(0.5rem, env(safe-area-inset-right));
+    bottom: calc(9.35rem + env(safe-area-inset-bottom));
+    width: min(25rem, calc(100vw - 1rem));
+    max-height: calc(100dvh - 11rem - env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 380px) {
+  .ss-assistant-launcher {
+    width: 3.35rem;
+    height: 3.35rem;
+  }
+
+  .ss-assistant-panel {
+    max-height: calc(100dvh - 10.5rem - env(safe-area-inset-bottom));
+    border-radius: 1.15rem;
+  }
+}

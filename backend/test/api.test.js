@@ -28,7 +28,108 @@ after(async () => {
 test("health endpoint responds with the documented status", async () => {
   const response = await fetch(`${baseUrl}/api/health`);
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { success: true, message: "Backend is running" });
+  const payload = await response.json();
+  assert.equal(payload.success, true);
+  assert.equal(payload.message, "Backend is running");
+  assert.deepEqual(payload.speechToText, { state: "not_started", requestedModel: "tiny" });
+});
+
+test("assistant endpoint validates question text and selected language", async () => {
+  const cookie = `${AUTH_COOKIE}=${generateToken("507f1f77bcf86cd799439011")}`;
+  const invalidLanguage = await fetch(`${baseUrl}/api/assistant/respond`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+    body: JSON.stringify({
+      question: "How do I check a message?",
+      language: "fr",
+    }),
+  });
+  assert.equal(invalidLanguage.status, 400);
+
+  const longQuestion = await fetch(`${baseUrl}/api/assistant/respond`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+    body: JSON.stringify({ question: "a".repeat(1201), language: "en" }),
+  });
+  assert.equal(longQuestion.status, 400);
+});
+
+test("assistant endpoint requires a valid login session", async () => {
+  const anonymous = await fetch(`${baseUrl}/api/assistant/respond`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question: "hi", language: "en" }),
+  });
+  assert.equal(anonymous.status, 401);
+
+  const authenticated = await fetch(`${baseUrl}/api/assistant/respond`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `${AUTH_COOKIE}=${generateToken("507f1f77bcf86cd799439011")}`,
+    },
+    body: JSON.stringify({ question: "hi", language: "en" }),
+  });
+  assert.equal(authenticated.status, 200);
+  const payload = await authenticated.json();
+  assert.equal(payload.success, true);
+  assert.match(payload.answer, /Hi! I’m your ScamShield assistant/);
+
+  const aiRequired = await fetch(`${baseUrl}/api/assistant/respond`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `${AUTH_COOKIE}=${generateToken("507f1f77bcf86cd799439011")}`,
+    },
+    body: JSON.stringify({
+      question: "Explain domain squatting with examples.",
+      language: "en",
+    }),
+  });
+  assert.equal(aiRequired.status, 503);
+  const error = await aiRequired.json();
+  assert.match(error.message, /AI_API_KEY, AI_API_URL, and AI_MODEL/);
+  assert.equal(error.code, "AI_NOT_CONFIGURED");
+});
+
+test("assistant transcription requires login and validates language, format, and empty audio", async () => {
+  const cookie = `${AUTH_COOKIE}=${generateToken("507f1f77bcf86cd799439011")}`;
+  const audioForm = (language, mimeType = "audio/webm", audio = "recorded audio") => {
+    const form = new FormData();
+    form.append("audio", new Blob([audio], { type: mimeType }), "question.webm");
+    form.append("language", language);
+    return form;
+  };
+
+  const anonymous = await fetch(`${baseUrl}/api/assistant/transcribe`, {
+    method: "POST",
+    body: audioForm("en"),
+  });
+  assert.equal(anonymous.status, 401);
+
+  const invalidLanguage = await fetch(`${baseUrl}/api/assistant/transcribe`, {
+    method: "POST",
+    headers: { Cookie: cookie },
+    body: audioForm("fr"),
+  });
+  assert.equal(invalidLanguage.status, 400);
+
+  const unsupportedFormat = await fetch(`${baseUrl}/api/assistant/transcribe`, {
+    method: "POST",
+    headers: { Cookie: cookie },
+    body: audioForm("en", "image/png"),
+  });
+  assert.equal(unsupportedFormat.status, 415);
+
+  for (const language of ["en", "hi", "bn"]) {
+    const emptyAudio = await fetch(`${baseUrl}/api/assistant/transcribe`, {
+      method: "POST",
+      headers: { Cookie: cookie },
+      body: audioForm(language, "audio/webm", ""),
+    });
+    assert.equal(emptyAudio.status, 400);
+    assert.equal((await emptyAudio.json()).code, "STT_EMPTY_AUDIO");
+  }
 });
 
 test("screenshot extraction finds links, phone numbers, emails, and UPI IDs", () => {
@@ -86,6 +187,21 @@ test("credentialed CORS allows the configured frontend origin", async () => {
   const response = await fetch(`${baseUrl}/api/health`, { headers: { Origin: "http://localhost:5174" } });
   assert.equal(response.headers.get("access-control-allow-origin"), "http://localhost:5174");
   assert.equal(response.headers.get("access-control-allow-credentials"), "true");
+});
+
+test("development CORS accepts the loopback alias for the configured frontend", async () => {
+  if (process.env.NODE_ENV === "production") return;
+  const response = await fetch(`${baseUrl}/api/health`, {
+    headers: { Origin: "http://127.0.0.1:5174" },
+  });
+  assert.equal(
+    response.headers.get("access-control-allow-origin"),
+    "http://127.0.0.1:5174",
+  );
+  assert.equal(
+    response.headers.get("access-control-allow-credentials"),
+    "true",
+  );
 });
 
 test("credentialed CORS handles the frontend login preflight", async () => {

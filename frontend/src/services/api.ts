@@ -7,7 +7,24 @@ import type {
   UiLanguage,
 } from "@/lib/types";
 
-const API_BASE_URL = import.meta.env["VITE_API_BASE_URL"] || "http://localhost:5001/api";
+const CONFIGURED_API_BASE_URL = import.meta.env["VITE_API_BASE_URL"] || "http://localhost:5001/api";
+
+function getApiBaseUrl(): string {
+  if (typeof window === "undefined") return CONFIGURED_API_BASE_URL;
+  try {
+    const apiUrl = new URL(CONFIGURED_API_BASE_URL);
+    const loopbackHosts = ["localhost", "127.0.0.1"];
+    if (
+      loopbackHosts.includes(apiUrl.hostname) &&
+      loopbackHosts.includes(window.location.hostname)
+    ) {
+      apiUrl.hostname = window.location.hostname;
+    }
+    return apiUrl.toString().replace(/\/$/, "");
+  } catch {
+    return CONFIGURED_API_BASE_URL.replace(/\/$/, "");
+  }
+}
 
 export interface AuthUser {
   id: string;
@@ -22,10 +39,70 @@ export interface ContactInput {
   relationship: string;
 }
 
+export async function askAssistant(question: string, language: UiLanguage): Promise<string> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 20000);
+  let result: { answer?: unknown };
+  try {
+    result = await request<{ answer?: unknown }>("/assistant/respond", {
+      ...jsonBody({ question, language }),
+      signal: controller.signal,
+    });
+  } finally {
+    window.clearTimeout(timeout);
+  }
+  if (typeof result.answer !== "string" || !result.answer.trim()) {
+    throw new ApiError("The assistant returned an invalid response.", 502, "AI_BAD_RESPONSE");
+  }
+  return result.answer;
+}
+
+export async function transcribeAssistantAudio(audio: Blob, language: UiLanguage): Promise<string> {
+  const formData = new FormData();
+  const mediaType = audio.type.split(";")[0].toLowerCase() || "audio/webm";
+  const extension =
+    mediaType === "audio/ogg"
+      ? "ogg"
+      : mediaType === "audio/mp4" || mediaType === "audio/x-m4a"
+        ? "m4a"
+        : mediaType === "audio/mpeg" || mediaType === "audio/mp3"
+          ? "mp3"
+          : mediaType === "audio/wav" || mediaType === "audio/x-wav"
+            ? "wav"
+            : mediaType === "audio/flac" || mediaType === "audio/x-flac"
+              ? "flac"
+              : "webm";
+  formData.append("audio", audio, `question.${extension}`);
+  formData.append("language", language);
+
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 61 * 60 * 1000);
+  let result: { transcript?: unknown };
+  try {
+    result = await request<{ transcript?: unknown }>("/assistant/transcribe", {
+      method: "POST",
+      body: formData,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.code === "AI_TIMEOUT") {
+      throw new ApiError(error.message, error.status, "STT_TIMEOUT");
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+  if (typeof result.transcript !== "string" || !result.transcript.trim()) {
+    throw new ApiError("Speech recognition returned no transcript.", 502, "STT_BAD_RESPONSE");
+  }
+  return result.transcript.trim();
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    readonly code: string | null = null,
   ) {
     super(message);
     this.name = "ApiError";
@@ -35,15 +112,20 @@ export class ApiError extends Error {
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await fetch(`${getApiBaseUrl()}${path}`, {
       ...options,
       credentials: "include",
       headers: {
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(options.body && !(typeof FormData !== "undefined" && options.body instanceof FormData)
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...options.headers,
       },
     });
   } catch {
+    if (options.signal?.aborted) {
+      throw new ApiError("The assistant request timed out.", 504, "AI_TIMEOUT");
+    }
     throw new ApiError(
       "Cannot reach ScamShield right now. Check your connection and try again.",
       0,
@@ -52,7 +134,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new ApiError(payload.message || "We could not complete that request.", response.status);
+    throw new ApiError(
+      payload.message || "We could not complete that request.",
+      response.status,
+      typeof payload.code === "string" ? payload.code : null,
+    );
   }
   return payload as T;
 }
@@ -229,33 +315,37 @@ function fromServerCheck(check: ServerCheck, language: UiLanguage): AnalysisResu
   const level =
     check.riskLevel === "low" ? "safe" : check.riskLevel === "suspicious" ? "suspicious" : "high";
 
-  const normalizedSignals = Array.isArray(check.signals) && check.signals.length > 0
-    ? check.signals.map((signal) => ({
-        category: SIGNAL_DETAILS[signal.type]?.category || "Context",
-        severity:
-          signal.severity === "high"
-            ? ("critical" as const)
-            : signal.severity === "medium"
-              ? ("warn" as const)
-              : ("ok" as const),
-        title: SIGNAL_DETAILS[signal.type]?.title || signal.type || "A warning signal was found",
-        explanation: signal.explanation || SIGNAL_DETAILS[signal.type]?.explanation || "Review this signal and verify the message independently.",
-      }))
-    : check.matchedSignals.map((matchedSignal) => {
-        const details = SIGNAL_DETAILS[matchedSignal];
-        return {
-          category: details?.category || "Context",
+  const normalizedSignals =
+    Array.isArray(check.signals) && check.signals.length > 0
+      ? check.signals.map((signal) => ({
+          category: SIGNAL_DETAILS[signal.type]?.category || "Context",
           severity:
-            level === "safe"
-              ? ("ok" as const)
-              : level === "suspicious"
+            signal.severity === "high"
+              ? ("critical" as const)
+              : signal.severity === "medium"
                 ? ("warn" as const)
-                : ("critical" as const),
-          title: details?.title || "A warning signal was found",
+                : ("ok" as const),
+          title: SIGNAL_DETAILS[signal.type]?.title || signal.type || "A warning signal was found",
           explanation:
-            details?.explanation || "Review this signal and verify the message independently.",
-        };
-      });
+            signal.explanation ||
+            SIGNAL_DETAILS[signal.type]?.explanation ||
+            "Review this signal and verify the message independently.",
+        }))
+      : check.matchedSignals.map((matchedSignal) => {
+          const details = SIGNAL_DETAILS[matchedSignal];
+          return {
+            category: details?.category || "Context",
+            severity:
+              level === "safe"
+                ? ("ok" as const)
+                : level === "suspicious"
+                  ? ("warn" as const)
+                  : ("critical" as const),
+            title: details?.title || "A warning signal was found",
+            explanation:
+              details?.explanation || "Review this signal and verify the message independently.",
+          };
+        });
 
   if (normalizedSignals.length === 0) {
     normalizedSignals.push({
@@ -312,7 +402,12 @@ export async function analyzeScam(
       status: "LOW RISK" | "SUSPICIOUS" | "HIGH RISK";
       reasons: string[];
     }>("/phone/check", jsonBody({ phone: content }));
-    const level = result.status === "LOW RISK" ? "safe" : result.status === "SUSPICIOUS" ? "suspicious" : "high";
+    const level =
+      result.status === "LOW RISK"
+        ? "safe"
+        : result.status === "SUSPICIOUS"
+          ? "suspicious"
+          : "high";
 
     return {
       id: `phone-${Date.now()}`,
@@ -322,11 +417,17 @@ export async function analyzeScam(
       level,
       score: result.riskScore,
       headline: result.status,
-      summary: "Automated risk assessment only. This does not guarantee that the number is safe or identify who is calling.",
+      summary:
+        "Automated risk assessment only. This does not guarantee that the number is safe or identify who is calling.",
       reasons: result.reasons,
       signals: result.reasons.map((reason) => ({
         category: "Sender" as const,
-        severity: level === "safe" ? ("ok" as const) : level === "suspicious" ? ("warn" as const) : ("critical" as const),
+        severity:
+          level === "safe"
+            ? ("ok" as const)
+            : level === "suspicious"
+              ? ("warn" as const)
+              : ("critical" as const),
         title: reason,
         explanation: reason,
       })),
@@ -350,20 +451,26 @@ export async function analyzeScam(
   return fromServerCheck(result, language);
 }
 
-export async function analyzeScreenshot(file: File, language: UiLanguage): Promise<ScreenshotAnalysis> {
+export async function analyzeScreenshot(
+  file: File,
+  language: UiLanguage,
+): Promise<ScreenshotAnalysis> {
   const formData = new FormData();
   formData.append("screenshot", file, file.name);
   formData.append("language", language);
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}/screenshot/analyze`, {
+    response = await fetch(`${getApiBaseUrl()}/screenshot/analyze`, {
       method: "POST",
       body: formData,
       credentials: "include",
     });
   } catch {
-    throw new ApiError("Cannot reach ScamShield right now. Check your connection and try again.", 0);
+    throw new ApiError(
+      "Cannot reach ScamShield right now. Check your connection and try again.",
+      0,
+    );
   }
 
   const payload = await response.json().catch(() => ({}));

@@ -1148,8 +1148,8 @@ export function VoiceAssistant() {
               <button
                 type="button"
                 onClick={() => {
-                  if (status === "listening") stopRecording();
-                  else void startListening();
+                  if (status === "listening") browserRecognitionRef.current?.stop();
+                  else startBrowserFallback();
                 }}
                 disabled={status === "processing" || status === "transcribing"}
                 aria-label={status === "listening" ? copy.stopListening : copy.listen}

@@ -149,7 +149,9 @@ function getFallbackAnswer(question, language) {
   const normalized = String(question ?? "")
     .normalize("NFKC")
     .toLocaleLowerCase()
-    .replace(/[.!?,।؛؟]+/g, " ")
+    .replace(/[ -]+/g, " ")
+    .replace(/[.!?,؛।?]+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
   const fallback = FALLBACK_ANSWERS[safeLanguage];
 
@@ -157,143 +159,200 @@ function getFallbackAnswer(question, language) {
     return DEFAULT_FALLBACKS[safeLanguage];
   }
 
+  const matchesAny = (patterns) => patterns.some((pattern) => pattern.test(normalized));
+
   if (
-    /^(hi|hello|hey|hii|hiya|good morning|good afternoon|good evening|how are you|how r u|can you help(?: me)?|could you help(?: me)?|what can you help me with|help me|thanks|thank you|thank u|nice|oh nice|okay|alright|ok|नमस्ते|नमस्कार|हेलो|हाय|कैसे हैं|कैसी हैं|कैसे हो|धन्यवाद|शुक्रिया|क्या आप मेरी मदद कर सकते हैं|मदद कीजिए|হ্যালো|নমস্কার|ধন্যবাদ|কেমন আছেন|কেমন আছো|আপনি কি আমাকে সাহায্য করতে পারেন|আমাকে সাহায্য করুন)(\s|$)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /^(hi|hello|hey|hii|hiya|good morning|good afternoon|good evening|how are you|how are u|how r u|what's up|sup|can you help(?: me)?|could you help(?: me)?|what can you help me with|help me|thanks|thank you|thank u|nice|oh nice|okay|alright|ok|namaste|namaskar|hallo|hola)(?:\s|$)/u,
+      /(नमस्ते|नमस्कार|हेलो|हाय|कैसे हैं|कैसी हैं|कैसे हो|धन्यवाद|शुक्रिया|क्या आप मेरी मदद कर सकते हैं|मदद कीजिए|হ্যালো|নমস্কার|ধন্যবাদ|কেমন আছেন|কেমন আছো|আপনি কি আমাকে সাহায্য করতে পারেন|আমাকে সাহায্য করুন)(?:\s|$)/u,
+      /(hello|hi|hey|thanks|thank you|nice|okay|alright|ok|good|great|amazing|appreciate it)(?:\s|$)/u,
+    ])
   ) {
     return fallback.greeting;
   }
+
   if (
-    /\b(what is scamshield|what does scamshield do|about scamshield)\b|scamshield.{0,25}(?:क्या है|क्या करता)|(?:স্ক্যামশিল্ড|scamshield).{0,25}(?:কী|কি)(?:\s|$)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:what is scamshield|what does scamshield do|about scamshield|scamshield.*(what|is|does))/u,
+      /(?:scamshield|স্ক্যামশিল্ড).{0,25}(?:क्या है|क्या करता|কী|কি|এটা কি|কী কাজ করে)/u,
+    ])
   ) {
     return fallback.about;
   }
+
   if (
-    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:message|msg)|check(?:\s+(?:this|a|the))?\s*(?:message|msg)|check\s+(?:a\s+)?suspicious\s+message|suspicious\s+message|message\s+check|msg\s+check)\b|संदिग्ध संदेश|मैसेज.{0,12}जाँच|संदेश.{0,12}जांच|सন্দেহজনক বার্তা|বার্তা.{0,12}(?:পরীক্ষা|যাচাই)|(?:message|msg).{0,12}(?:check|verify|scam)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(check|verify|is this|is it|safe|scam).*?(message|msg|sms|text)|(?:message|msg|sms|text).*?(check|verify|safe|scam)|(?:how can i check|want to check).*?(message|msg|sms|text)|(?:suspicious|fake|fraud|bogus).*?(message|msg|sms|text)/u,
+      /(संदिग्ध|संदेहजनक|फर्जी|झूठा|भ्रामक|ভুয়া|ভুল|scam).{0,30}(संदेश|मैसेज|बार्ता|মেসেজ|টেক্স्ट)|(?:संदेश|मैसेज|बार्ता|মেসেজ|টেক্স्ट).{0,30}(जांच|जाँच|चेक|যাচাই|পরীক্ষा|check|verify)|(?:कैसे|किस\s+तरह|कীভাবে|कিভাবে|এভাবে).{0,20}(संदेश|मैसेज|बार्ता|मেসेज|টেক্স्ट).{0,20}(जांच|जाँच|चेक|যাচাই|परिक्षा)/u,
+      /(সন্দেহজনক|ভুয়া|ফেক|কেলেঙ্কারি|জাল|স্ক্যাম).{0,30}(বার্তা|মেসেজ|টেক্সট)|(?:বার্তা|মেসেজ|টেক্সট).{0,30}(চেক|যাচাই|পরীক্ষা|check|verify)/u,
+    ])
   ) {
     return fallback.message;
   }
+
   if (
-    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:upi|upi\s+id|upi\s+request)|check(?:\s+(?:this|a|the))?\s*(?:upi|upi\s+id|upi\s+request)|check\s+(?:a\s+)?suspicious\s+upi|suspicious\s+upi|upi\s+check|fake\s+upi|upi\s+id|upi\s+request|identify.*upi)\b|नकली UPI|फर्जी UPI|UPI ID|यूपीआई|नकल UPI|ভুয়া UPI|ইউपিআই/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(check|verify|safe|scam).*?(upi|upi id|upi request|payment request|qr code|qr|transaction)|(?:upi|upi id|upi request|payment request|qr code|qr|transaction).*?(check|verify|safe|scam)|(?:how can i check|want to check).*?(upi|upi id|upi request|payment request)|(?:suspicious|fake|fraud).*?(upi|upi id|upi request)/u,
+      /(यूपीआई|इउपिआई|ইউपিআই|upi|upi id|payment request|qr code).{0,20}(चेक|जांच|जाँच|যাচাই|परীক্ষा|safe|scam)|(?:नकली|फर्जी|ভুয়া|झूठा).{0,20}(यूपीआई|इउपिआई|ইউपিআই|upi)|(?:यूपीआई|इउपिआई|ইউपিআই|upi).{0,20}(नकल|फेक|ঝুঁকি)/u,
+      /(ইউপিআই|upi|পেমেন্ট অনুরোধ|কিউআর কোড|কিউআর|আইডি).{0,20}(চেক|যাচাই|পরীক্ষা|scam|safe)/u,
+      /(?:নকল|ফেক|ভুয়া|জাল|ভুল).{0,20}(upi|ইউপিআই|আইডি|পেমেন্ট অনুরোধ|কিউআর)/u,
+    ])
   ) {
     return fallback.upi;
   }
+
   if (
-    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:link|url|website)|check(?:\s+(?:this|a|the))?\s*(?:link|url|website)|check\s+(?:a\s+)?suspicious\s+link|suspicious\s+link|link\s+check|url\s+check|is\s+this\s+link\s+safe|check\s+this\s+link)\b|संदिग्ध लिंक|लिंक.{0,12}जाँच|लिंक.{0,12}परख|लिंक.{0,12}परख|लিঙ্ক.{0,12}परिक्षा|संदেহজনক লিঙ্ক|लিঙ্ক.{0,12}যাচাই|(?:link|url|website).{0,12}(?:check|verify|scam|safe)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(check|verify|safe|scam).*?(link|url|website)|(?:link|url|website).*?(check|verify|safe|scam)|(?:how can i check|want to check).*?(link|url|website)|(?:suspicious|fake|fraud).*?(link|url|website)/u,
+      /(लिंक|लিঙ্ক|वेबसाइट|website|url).{0,20}(चेक|जांच|जाँच|যাচাই|परীক্ষा|safe|scam)|(?:संदिग्ध|संदेहजनक|फेक|ভুয়া|झूठा).{0,20}(लिंक|लিঙ্ক|ওয়েবসাইট)|(?:कैसे|किस\s+तरह|कীভাবে|कিভাবে|कেমন).{0,12}(लिंक|लিঙ্ক|ওয়েবसाइट).{0,12}(चेक|যাচাই|परীক্ষा)/u,
+      /(লিঙ্ক|ওয়েবসাইট|website|url).{0,20}(চেক|যাচাই|পরীক্ষা|scam|safe)/u,
+    ])
   ) {
     return fallback.link;
   }
+
   if (
-    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:screenshot|screenshots|image|images|photo|photos|picture|pictures)|check(?:\s+(?:this|a|the))?\s*(?:screenshot|screenshots|image|images|photo|photos|picture|pictures)|check\s+(?:a\s+)?suspicious\s+(?:screenshot|image|photo)|suspicious\s+(?:screenshot|image|photo)|(?:screenshot|screenshots|image|images|photo|photos|picture|pictures)\s+check)\b|स्क्रीनशॉट|तस्वीर|ছবি|स्क्रिनशट|इमेज|फोटो/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(check|verify|safe|scam).*?(screenshot|screenshots|image|images|photo|photos|picture|pictures|screen capture)|(?:screenshot|screenshots|image|images|photo|photos|picture|pictures|screen capture).*?(check|verify|safe|scam)|(?:how can i check|want to check).*?(screenshot|image|photo|picture)|(?:suspicious|fake|fraud).*?(screenshot|image|photo|picture)/u,
+      /(स्क्रिनशॉट|ছবি|ফটো|ইমেজ|পিকচার).{0,18}(चेक|जांच|जाँच|যাচাই|পরীক্ষा)|(?:कীভাবে|कিভাবে).{0,14}(स्क्रिनशॉट|ছবি|ফটো|ইমেজ|পিকচার).{0,15}(चेक|যাচাই|परिक्षा)/u,
+      /(স্ক্রিনशট|ছবি|ফটো|ইমেজ|পিকচার).{0,18}(চেক|যাচাই|পরীক্ষা|scam|safe)/u,
+    ])
   ) {
     return fallback.screenshot;
   }
+
   if (
-    /\b(?:save|add|remember|keep|store)(?:\s+.*)?\b(?:family member|trusted contact|trusted person|contact|mom|mother|dad|father|wife|husband|brother|sister|friend)\b|\b(?:family member|trusted contact|trusted person)\b.*\b(?:save|add|remember|keep|store)\b|(?:save|add|remember|keep|store).{0,18}(?:mother|father|mom|dad|sister|brother|wife|husband|family member|trusted contact)|(?:परिवार|विश्वस्त|भरोसेमंद|संपर्क).{0,30}(?:सहेज|जोड़|रखें|रख|याद)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:save|add|remember|keep|store).{0,30}(?:mom|mother|dad|father|wife|husband|brother|sister|family member|trusted contact|trusted person)|(?:mom|mother|dad|father|wife|husband|brother|sister|family member|trusted contact|trusted person).{0,30}(?:save|add|remember|keep|store)/u,
+      /(?:save|add|remember|keep|store).{0,30}(?:family|trusted|contact|person|relative)|(?:family|trusted|contact|relative).{0,30}(?:save|add|remember|keep|store)/u,
+      /(परिवार|विश्वस्त|भरोसेमंद|संपर्क|माँ|मम्मी|अम्मा|पिता|पत्नी|पति|भाई|बहन).{0,30}(सहेज|जोड़|रखें|रख|याद|सेव)|(?:सहेज|जोड़|रखें|रख|याद|सेव).{0,30}(परिवार|विश्वस्त|भरोसेमंद|संपर्क|माँ|मम्मी|अम्मा|पिता|पत्नी|पति|भाई|बहन)/u,
+      /(পরিবার|বিশ্বস্ত|বাবা|মা|স্বামী|স্ত্রী|ভাই|বোন|যোগ|সেভ).{0,30}(সংরক্ষণ|যোগ|রাখুন|সেভ)|(?:সংরক্ষণ|যোগ|রাখুন|সেভ).{0,30}(পরিবার|বিশ্বস্ত|বাবা|মা|স্বামী|স্ত্রী|ভাই|বোন)/u,
+    ])
   ) {
     return fallback.saveContact;
   }
+
   if (
-    /\b(?:block|remove|delete|ban|stop|ignore).*?(?:number|phone|caller|contact)|(?:number|phone|caller|contact).{0,20}(?:block|remove|delete|ban|stop)|(?:ब्लॉक|मिटाए|हटाएँ|रोकें).{0,20}(?:नंबर|फोन|कॉलर)|(?:ब्लक|মুছে ফেলুন|রাখুন).*?(?:नम্বর|ফোন|কলার)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:block|remove|delete|ban|stop|ignore).{0,20}(?:number|phone|caller|contact)|(?:number|phone|caller|contact).{0,20}(?:block|remove|delete|ban|stop)|(?:bl(?:ock)|delete|remove|ban).{0,20}(?:number|phone)/u,
+      /(ब्लॉक|मिटाए|हटाएँ|रोकें|রखें|মুছে\s+ফেলুন|ব্লক).{0,20}(नंबर|फोन|कॉलर|नम্বর|ফোন\s+नम্বর|কলার)|(?:नंबर|फोन|कॉलर|नम্বর|ফोन\s+नम্বর|কলার).{0,20}(ब्लॉक|मिटाए|हटाएँ|रोकें|মুছে\s+ফেলুন|ব্লক)/u,
+    ])
   ) {
     return fallback.unsupported;
   }
+
   if (
-    /\b(?:lost money|sent money|transferred money|paid scammer|scammer|fraud|cheated|i think i was scammed|i got scammed|money was taken|what should i do if i was scammed|financial cyber fraud)\b|(?:धोखाधड़ी|फ्रॉड|पैसे खोए|पैसा गया|घोटाला|संदिग्ध व्यक्ति).{0,20}|(?:প্রতারণা|ধোকা|টাকা হারানো|টাকা গেছে|স্ক্যাম).{0,20}/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:lost money|sent money|transferred money|paid scammer|scammer|fraud|cheated|i think i was scammed|i got scammed|money was taken|what should i do if i was scammed|financial cyber fraud)/u,
+      /(धोखाधड़ी|फ्रॉड|पैसे खोए|पैसा गया|घोटाला|संदिग्ध व्यक्ति|स्कैम).{0,20}|(?:प्रतारण|धोक|টাকা হারানো|টাকা গেছে).{0,20}/u,
+      /(প্রতারণা|ধোকা|টাকা হারানো|টাকা গেছে|স্ক্যাম|ফ্রড).{0,20}/u,
+    ])
   ) {
     return fallback.emergency;
   }
+
   if (
-    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:phone\s*number|phonenumber|number|caller|call)|check(?:\s+(?:this|a|the))?\s*(?:phone\s*number|phonenumber|number|caller|call)|check\s+(?:a\s+)?suspicious\s+(?:phone\s*number|phonenumber|number)|suspicious\s+(?:phone\s*number|phonenumber|number)|(?:phone\s*number|phonenumber|number|caller|call)\s+check|(?:check|verify|is this|is it|could be|looks like|suspicious|fraud|fake|scam).*?(?:phone|number|caller|call)|(?:phone|number|caller|call).{0,25}(?:suspicious|fraud|fake|scam)|(?:check whether|is this).*?(?:phone|number).*?(?:suspicious|scam))\b|(?:संदिग्ध|फर्जी|झूठा|धोखाधड़ी|स्कैम).{0,20}(?:फ़ोन|फोन|नंबर|कॉलर)|(?:स्क्याम|संदেহজনক|फेक|ভুয়া).{0,20}(?:नम্বর|फोन|कलार)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(how can i check|want to check|check.*phone|phone.*check|check.*number|number.*check|suspicious.*phone|suspicious.*number|phone.*suspicious|number.*suspicious|is this.*phone|is this.*number|caller.*scam|call.*scam)/u,
+      /(फ़ोन|फोन|नंबर|कॉलर|नम্বর|फोन\s+नम্বর|কল).{0,18}(संदिग्ध|फर्जी|झूठा|घोटाला|स्कैम|চেক|যাচাই|পরীক্ষা)|(?:कীভাবে|कিভাবে).{0,12}(फोन|नम্বর|नम्बर|কল).{0,12}(चेक|যাচাই|परীক্ষा)/u,
+      /(ফোন|নম্বর|কথা|কলার).{0,18}(সন্দেহজনক|ভুয়া|ফেক|স্ক্যাম|চেক|যাচাই|পরীক্ষা)/u,
+    ])
   ) {
     return fallback.phoneCheck;
   }
+
   if (
-    /\b(history|previous checks|saved checks|where can i find.*history|where do i find.*history)\b|इतिहास|पिछली जाँच|আগের পরীক্ষা|ইतিহাস/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:history|previous checks|saved checks|where can i find.*history|where do i find.*history)/u,
+      /(इतिहास|पिछली जाँच|আগের পরীক্ষা|ইতিহাস)/u,
+    ])
   ) {
     return fallback.history;
   }
-  if (/\b(weekly report|weekly reports|weekly summary)\b|साप्ताहिक रिपोर्ट|সাপ্তাহিক রিপোর্ট/u.test(normalized)) {
+
+  if (
+    matchesAny([
+      /(?:weekly report|weekly reports|weekly summary|insights?|summary)/u,
+      /(साप्ताहिक रिपोर्ट|साप्ताहिक रिपोर्ट|जानकारी|रुझान|ইনসাইট|সামারি)/u,
+    ])
+  ) {
     return fallback.insights;
   }
-  if (/\b(report a scam|report scam|file a report|report|reporting)\b|घोटाले की रिपोर्ट|रिपোর্ট|রিপোর্ট|অভিযোগ/u.test(normalized)) {
+
+  if (
+    matchesAny([
+      /(?:report a scam|report scam|file a report|report|reporting)/u,
+      /(घोटाले की रिपोर्ट|रिपोर्ट|অভিযোগ)/u,
+    ])
+  ) {
     return fallback.report;
   }
-  if (/\b(insights?|weekly|summary)\b|जानकारी|साप्ताहिक|रुझान|সাপ্তাহিক|ইনসাইট/u.test(normalized)) {
-    return fallback.insights;
-  }
+
   if (
-    /\b(alerts?|warning)\b|चेतावनी|अलर्ट|সতর্কতা|অ্যালার্ট/u.test(normalized)
+    matchesAny([
+      /(?:alerts?|warning|alert)/u,
+      /(चेतावनी|अलर्ट|সতর্কতা|অ্যালার্ট)/u,
+    ])
   ) {
     return fallback.alerts;
   }
+
   if (
-    /\b(learn|learning|guide|phishing)\b|सीखें|सीखना|फ़िशिंग|फिशिंग|শিখুন|শিখতে|ফিশিং/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:learn|learning|guide|phishing|how phishing works)/u,
+      /(सीखें|सीखना|फ़िशिंग|फिशिंग|শিখুন|শিখতে|ফিশিং)/u,
+    ])
   ) {
     return fallback.learn;
   }
+
   if (
-    /\b(quiz|quizzes|practice)\b|प्रश्नोत्तरी|अभ्यास|কুইজ|অনুশীলন/u.test(
-      normalized,
-    )
-  )
+    matchesAny([
+      /(?:quiz|quizzes|practice|questionnaire)/u,
+      /(प्रश्नोत्तरी|अभ्यास|कুইज|অনুশীলন)/u,
+    ])
+  ) {
     return fallback.quiz;
+  }
+
   if (
-    /\b(family|trusted contact|trusted person)\b|परिवार|भरोसेमंद व्यक्ति|विश्वस्त संपर्क|পরিবার|বিশ্বস্ত ব্যক্তি/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:family|trusted contact|trusted person|relative)/u,
+      /(परिवार|भरोसेमंद व्यक्ति|विश्वस्त संपर्क|ভাই|বোন|পরিবার|বিশ্বস্ত ব্যক্তি)/u,
+    ])
   ) {
     return fallback.family;
   }
+
   if (
-    /\b(settings?|accessibility|large text|contrast)\b|सेटिंग|सुलभता|बड़ा पाठ|বড় লেখা|সেটিং|অ্যাক্সেসিবিলিটি/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:settings?|accessibility|large text|contrast|language)/u,
+      /(सेटिंग|सुलभता|बड़ा पाठ|বড় লেখা|সেটিং|অ্যাক্সেসিবিলিটি|ভাষা)/u,
+    ])
   ) {
     return fallback.settings;
   }
+
   if (
-    /\b(risk score|risk level|result|verdict)\b|जोखिम स्कोर|जोखिम स्तर|নিরাপত্তার স্কোর|ঝুঁকির স্কোর/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:risk score|risk level|result|verdict)/u,
+      /(जोखिम स्कोर|जोखिम स्तर|निरापत्तार स्कोर|ঝুঁকির স্কोर)/u,
+    ])
   ) {
     return fallback.risk;
   }
 
   if (
-    /\b(?:thanks|thank you|thank u|good|nice|great|amazing|appreciate it|oh nice|okay|alright|ok)\b|(?:धन्यवाद|शुक्रिया|अच्छा|बहुत अच्छा|ठीक है|बढ़िया|धन्यवाद)|(?:ধন্যবাদ|ভাল|চমৎকার|ঠিক আছে|আচ্ছা)/u.test(
-      normalized,
-    )
+    matchesAny([
+      /(?:thanks|thank you|thank u|good|nice|great|amazing|appreciate it|oh nice|okay|alright|ok|good job)/u,
+      /(धन्यवाद|शुक्रिया|अच्छा|बहुत अच्छा|ठीक है|बढ़िया|धন্যবাদ|ভাল|চমৎকার|ঠিক আছে|আচ্ছা)/u,
+    ])
   ) {
     return fallback.greeting;
   }
 
   return undefined;
 }
-
 export { getFallbackAnswer };
 
 function parseAnswer(content) {

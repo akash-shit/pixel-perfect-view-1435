@@ -6,6 +6,12 @@ const LANGUAGE_NAMES = {
   bn: "Bengali",
 };
 
+const DEFAULT_FALLBACKS = {
+  en: "I’m having trouble connecting to my AI service right now, but I can still help with ScamShield’s available features. You can ask me about checking a suspicious message, trusted contacts, your check history, or scam safety.",
+  hi: "मैं अभी अपने AI सेवा से कनेक्ट करने में समस्या महसूस कर रहा हूँ, लेकिन ScamShield की उपलब्ध सुविधाओं में अभी भी मदद कर सकता हूँ। आप मुझे संदिग्ध संदेश की जाँच, भरोसेमंद संपर्क, आपकी जाँच इतिहास, या स्कैम सुरक्षा के बारे में पूछ सकते हैं।",
+  bn: "আমি এখনও আমার AI সেবার সাথে সংযোগ করতে পারছি না, কিন্তু ScamShield-এর উপলব্ধ ফিচার নিয়ে এখনও আপনাকে সাহায্য করতে পারি। আপনি আমাকে সন্দেহজনক বার্তা পরীক্ষা, বিশ্বস্ত পরিচিতি, পূর্বের যাচাই, বা স্ক্যাম নিরাপত্তা নিয়ে জিজ্ঞাসা করতে পারেন।",
+};
+
 const FALLBACK_ANSWERS = {
   en: {
     greeting:
@@ -17,7 +23,9 @@ const FALLBACK_ANSWERS = {
     upi: "Open Check and choose the UPI option, or paste the UPI ID or payment request into Check. Verify the recipient inside your official payment app before paying. Never enter your UPI PIN to receive money; a check cannot prove an ID is safe.",
     link: "Open Check and choose Link, then paste the address. Don’t open it just to test it. ScamShield can point out warning signs, but no check can prove a link is safe; verify through the organization’s official app or website.",
     phone:
-      "Open Check and choose Phone Number, then enter the number. A report or warning is only an indicator, and no reports do not prove a caller is genuine. Verify callers using an official number you find yourself.",
+      "Open Check and choose Phone Number, then enter the number. A report or warning is only an indicator, and no report does not prove a caller is genuine. Verify callers using an official number you find yourself.",
+    phoneCheck:
+      "To check whether a phone number looks suspicious, open Check and choose Phone Number, then enter the number. Review the warning signs and verify it using an official number you find yourself. A warning is only an indicator, not proof that the caller is genuine.",
     email:
       "Open Check and choose Email, then paste the message and sender details. Don’t open unexpected attachments or links. ScamShield looks for warning signs, but its result is not proof that an email is genuine.",
     screenshot:
@@ -33,6 +41,12 @@ const FALLBACK_ANSWERS = {
     quiz: "Open Quiz to practise spotting scam warning signs with short examples.",
     family:
       "Open Family to add or manage trusted contacts. If something feels suspicious, ask someone you trust before paying or sharing information.",
+    saveContact:
+      "To save a family member or trusted contact, open Family, add their name, relationship, and phone number, and save it. This is separate from a scam check. A suspicious number can be checked in Check without saving it as a trusted contact.",
+    unsupported:
+      "ScamShield does not currently offer a direct assistant action to block or remove a phone number. Use the Family page to save trusted people, and use your phone’s built-in call/message blocking features if you need to stop unwanted calls.",
+    emergency:
+      "If you think you were scammed, stop replying and do not share any more OTP, password, PIN, or money. If money was lost in India, call 1930 as soon as possible and report it on cybercrime.gov.in. Keep the suspected number and any proof and tell a trusted person.",
     report:
       "Open Report to record a suspected scam for your own report flow. If money was taken in India, call 1930 promptly and report through cybercrime.gov.in.",
     settings:
@@ -50,6 +64,8 @@ const FALLBACK_ANSWERS = {
     link: "जाँचें खोलें, लिंक चुनें और पता पेस्ट करें। जाँचने के लिए लिंक न खोलें। ScamShield चेतावनी के संकेत बता सकता है, लेकिन सुरक्षित होने का प्रमाण नहीं; संस्था की आधिकारिक ऐप या वेबसाइट से पुष्टि करें।",
     phone:
       "जाँचें खोलें, फ़ोन नंबर चुनें और नंबर डालें। रिपोर्ट या चेतावनी केवल संकेत है; रिपोर्ट न होना कॉलर के असली होने का प्रमाण नहीं। खुद ढूँढे आधिकारिक नंबर से पुष्टि करें।",
+    phoneCheck:
+      "फ़ोन नंबर की संदिग्धता जाँचने के लिए Check खोलें, Phone Number चुनें, और नंबर डालें। चेतावनी के संकेत देखें और खुद के ढूँढे आधिकारिक नंबर से पुष्टि करें। चेतावनी संकेत है, कॉलर के असली होने का प्रमाण नहीं।",
     email:
       "जाँचें खोलें, ईमेल चुनें और संदेश व भेजने वाले की जानकारी पेस्ट करें। अनजान अटैचमेंट या लिंक न खोलें। जाँच चेतावनी के संकेत दिखाती है, ईमेल के असली होने का प्रमाण नहीं।",
     screenshot:
@@ -65,6 +81,12 @@ const FALLBACK_ANSWERS = {
     quiz: "छोटे उदाहरणों के साथ घोटाले के संकेत पहचानने का अभ्यास करने के लिए प्रश्नोत्तरी खोलें।",
     family:
       "विश्वस्त संपर्क जोड़ने या सँभालने के लिए परिवार खोलें। कुछ संदिग्ध लगे तो पैसे देने या जानकारी साझा करने से पहले किसी भरोसेमंद व्यक्ति से पूछें।",
+    saveContact:
+      "परिवार के सदस्य या विश्वस्त संपर्क को सहेजने के लिए Family खोलें, उनका नाम, रिश्ता और फ़ोन नंबर भरें और सेव करें। यह जाँच से अलग है। संदिग्ध नंबर को बिना सहेजे Check में जाँचा जा सकता है।",
+    unsupported:
+      "ScamShield में अभी सीधे किसी नंबर को ब्लॉक या हटाने की एआई सुविधा नहीं है। विश्वस्त संपर्क के लिए Family का उपयोग करें, और unwanted कॉल रोकने के लिए अपने फ़ोन की ब्लॉक सुविधा का उपयोग करें।",
+    emergency:
+      "अगर लगता है कि धोखाधड़ी हुई है, तो जवाब देना बंद करें और और OTP, पासवर्ड, PIN या पैसा न दें। भारत में पैसा खोया हो तो तुरंत 1930 पर कॉल करें और cybercrime.gov.in पर रिपोर्ट करें। संदिग्ध नंबर और सबूत सुरक्षित रखें।",
     report:
       "संदिग्ध घोटाले की जानकारी दर्ज करने के लिए रिपोर्ट खोलें। भारत में पैसे का नुकसान हुआ है तो तुरंत 1930 पर कॉल करें और cybercrime.gov.in पर रिपोर्ट करें।",
     settings:
@@ -82,6 +104,8 @@ const FALLBACK_ANSWERS = {
     link: "Check খুলে Link বেছে ঠিকানাটি পেস্ট করুন। পরীক্ষা করার জন্য লিঙ্ক খুলবেন না। ScamShield সতর্কতার লক্ষণ জানাতে পারে, কিন্তু নিরাপদ হওয়ার প্রমাণ দিতে পারে না; প্রতিষ্ঠানের অফিসিয়াল অ্যাপ বা ওয়েবসাইটে যাচাই করুন।",
     phone:
       "Check খুলে Phone Number বেছে নম্বরটি লিখুন। রিপোর্ট বা সতর্কতা কেবল ইঙ্গিত; রিপোর্ট না থাকলেই কলটি আসল প্রমাণ হয় না। নিজে খুঁজে পাওয়া অফিসিয়াল নম্বরে যাচাই করুন।",
+    phoneCheck:
+      "ফোন নম্বর সন্দেহজনক কিনা বুঝতে Check খুলে Phone Number বেছে নম্বরটি লিখুন। সতর্কতার লক্ষণ দেখুন এবং নিজে খুঁজে পাওয়া অফিসিয়াল নম্বরে যাচাই করুন। সতর্কতা কেবল ইঙ্গিত, কলার আসল হওয়ার প্রমাণ নয়।",
     email:
       "Check খুলে Email বেছে বার্তা ও প্রেরকের তথ্য পেস্ট করুন। অচেনা সংযুক্তি বা লিঙ্ক খুলবেন না। পরীক্ষা সতর্কতার লক্ষণ দেখায়, ইমেলটি আসল প্রমাণ করে না।",
     screenshot:
@@ -97,6 +121,12 @@ const FALLBACK_ANSWERS = {
     quiz: "ছোট উদাহরণে প্রতারণার লক্ষণ চেনার অনুশীলন করতে Quiz খুলুন।",
     family:
       "বিশ্বস্ত পরিচিতি যোগ বা পরিচালনা করতে Family খুলুন। সন্দেহ হলে টাকা দেওয়া বা তথ্য জানানোর আগে বিশ্বস্ত কাউকে জিজ্ঞাসা করুন।",
+    saveContact:
+      "পরিবারের সদস্য বা বিশ্বস্ত পরিচিতি সংরক্ষণ করতে Family খুলুন, তাদের নাম, সম্পর্ক এবং ফোন নম্বর লিখে Save করুন। এটি স্ক্যাম চেকের থেকে আলাদা। সন্দেহজনক নম্বরকে সংরক্ষণ না করেই Check-এ পরীক্ষা করা যায়।",
+    unsupported:
+      "ScamShield-এ এখন সরাসরি কোনো নম্বর ব্লক বা মুছে ফেলার এআই কার্যকলাপ নেই। বিশ্বস্ত পরিচিতি রাখার জন্য Family ব্যবহার করুন, আর অবাঞ্ছিত কল বন্ধ করতে আপনার ফোনের ব্লক বিকল্প ব্যবহার করুন।",
+    emergency:
+      "যদি মনে হয় প্রতারণা হয়েছে, কথা বলা বন্ধ করুন এবং আরও OTP, পাসওয়ার্ড, PIN বা টাকা দেবেন না। ভারতে টাকা হারিয়ে থাকলে দ্রুত ১৯৩০-এ কল করুন এবং cybercrime.gov.in-এ রিপোর্ট করুন। সন্দেহজনক নম্বর ও প্রমাণ রাখা জরুরি।",
     report:
       "সন্দেহজনক প্রতারণার তথ্য নথিভুক্ত করতে Report খুলুন। ভারতে টাকা হারালে দ্রুত ১৯৩০ নম্বরে কল করুন এবং cybercrime.gov.in-এ রিপোর্ট করুন।",
     settings:
@@ -105,24 +135,30 @@ const FALLBACK_ANSWERS = {
   },
 };
 
-const SYSTEM_PROMPT = `You are the friendly ScamShield digital safety assistant for people in India.
-Answer the user's question clearly and concisely in the exact language and script requested: English, Hindi (हिन्दी), or Bengali (বাংলা). Do not merely translate labels; understand the question and answer it in that language. Use simple, reassuring language and short steps, especially for users with limited technical experience.
-Explain ScamShield features accurately: message, link, phone number, email, UPI ID and screenshot checks; scam alerts; weekly insights and reports; learning guides; quizzes; trusted family contacts; check history; accessibility settings; and emergency support. Tell users that checks are indicators, not proof that something is safe.
-Never claim a message, link, caller, email, or UPI ID is definitely safe. Do not request, repeat, or encourage sharing OTPs, passwords, PINs, CVVs, banking details, or other secrets.
+const SYSTEM_PROMPT = `You are the professional ScamShield digital safety assistant for India.
+Answer the user clearly and briefly in the requested language: English, Hindi (हिन्दी), or Bengali (বাংলा). Use simple, evidence-based guidance and keep it suitable for first-time or elderly users.
+Stay grounded in the actual ScamShield app: the implemented pages are Check, History, Insights, Alerts, Learn, Quiz, Family, Report, Settings, Emergency, and Dashboard. Only describe functionality that exists in this app. A check is an indicator, not proof that a message, link, phone number, email, or UPI ID is safe.
+When a user asks to save a family member or trusted contact, explain that this belongs in the Family page and must be done through the app by the user after confirming the contact. Do not claim the assistant itself can directly add, update, delete, or block contacts unless the app API is explicitly available and the user has authorized the action.
+If the user asks to block or remove a number, explain that this feature is not currently provided by the assistant and should be handled through the phone's security or blocking settings.
 If the user may have lost money to financial cyber fraud in India, advise them to stop interacting with the suspected scammer, not share any more credentials, call 1930 promptly, and report at the official portal https://cybercrime.gov.in. Be calm and supportive.
-Do not invent app functionality, account details, or facts. If unsure, say so and suggest verifying through an organization's official channel.
+Never request or encourage sharing OTPs, passwords, PINs, CVVs, banking details, or other secrets. Do not invent app features, contact APIs, or facts.
 Return only a JSON object with one string property named "answer".`;
 
 function getFallbackAnswer(question, language) {
-  const normalized = question
+  const safeLanguage = FALLBACK_ANSWERS[language] ? language : "en";
+  const normalized = String(question ?? "")
     .normalize("NFKC")
     .toLocaleLowerCase()
     .replace(/[.!?,।؛؟]+/g, " ")
     .trim();
-  const fallback = FALLBACK_ANSWERS[language];
+  const fallback = FALLBACK_ANSWERS[safeLanguage];
+
+  if (!normalized) {
+    return DEFAULT_FALLBACKS[safeLanguage];
+  }
 
   if (
-    /^(hi|hello|hey|hii|hiya|good morning|good afternoon|good evening|how are you|how r u|can you help(?: me)?|could you help(?: me)?|what can you help me with|help me|नमस्ते|नमस्कार|हेलो|हाय|कैसे हैं|कैसी हैं|कैसे हो|क्या आप मेरी मदद कर सकते हैं|मदद कीजिए|হ্যালো|নমস্কার|কেমন আছেন|কেমন আছো|আপনি কি আমাকে সাহায্য করতে পারেন|আমাকে সাহায্য করুন)(\s|$)/u.test(
+    /^(hi|hello|hey|hii|hiya|good morning|good afternoon|good evening|how are you|how r u|can you help(?: me)?|could you help(?: me)?|what can you help me with|help me|thanks|thank you|thank u|nice|oh nice|okay|alright|ok|नमस्ते|नमस्कार|हेलो|हाय|कैसे हैं|कैसी हैं|कैसे हो|धन्यवाद|शुक्रिया|क्या आप मेरी मदद कर सकते हैं|मदद कीजिए|হ্যালো|নমস্কার|ধন্যবাদ|কেমন আছেন|কেমন আছো|আপনি কি আমাকে সাহায্য করতে পারেন|আমাকে সাহায্য করুন)(\s|$)/u.test(
       normalized,
     )
   ) {
@@ -136,39 +172,63 @@ function getFallbackAnswer(question, language) {
     return fallback.about;
   }
   if (
-    /\b(how can i check|how do i check|check a suspicious message|check this message|suspicious message)\b|संदिग्ध संदेश|मैसेज.{0,12}जाँच|संदेश.{0,12}जांच|সন্দেহজনক বার্তা|বার্তা.{0,12}(?:পরীক্ষা|যাচাই)/u.test(
+    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:message|msg)|check(?:\s+(?:this|a|the))?\s*(?:message|msg)|check\s+(?:a\s+)?suspicious\s+message|suspicious\s+message|message\s+check|msg\s+check)\b|संदिग्ध संदेश|मैसेज.{0,12}जाँच|संदेश.{0,12}जांच|सন্দেহজনক বার্তা|বার্তা.{0,12}(?:পরীক্ষা|যাচাই)|(?:message|msg).{0,12}(?:check|verify|scam)/u.test(
       normalized,
     )
   ) {
     return fallback.message;
   }
   if (
-    /\b(fake upi|upi id|upi request|identify.*upi)\b|नकली UPI|फर्जी UPI|UPI ID|यूपीआई|নকল UPI|ভুয়া UPI|UPI ID|ইউপিআই/u.test(
+    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:upi|upi\s+id|upi\s+request)|check(?:\s+(?:this|a|the))?\s*(?:upi|upi\s+id|upi\s+request)|check\s+(?:a\s+)?suspicious\s+upi|suspicious\s+upi|upi\s+check|fake\s+upi|upi\s+id|upi\s+request|identify.*upi)\b|नकली UPI|फर्जी UPI|UPI ID|यूपीआई|नकल UPI|ভুয়া UPI|ইউपিআই/u.test(
       normalized,
     )
   ) {
     return fallback.upi;
   }
   if (
-    /\b(screenshot|screen shot|image|photo)\b|स्क्रीनशॉट|तस्वीर|ছবি|স্ক্রিনশট/u.test(
+    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:link|url|website)|check(?:\s+(?:this|a|the))?\s*(?:link|url|website)|check\s+(?:a\s+)?suspicious\s+link|suspicious\s+link|link\s+check|url\s+check|is\s+this\s+link\s+safe|check\s+this\s+link)\b|संदिग्ध लिंक|लिंक.{0,12}जाँच|लिंक.{0,12}परख|लिंक.{0,12}परख|लিঙ্ক.{0,12}परिक्षा|संदেহজনক লিঙ্ক|लিঙ্ক.{0,12}যাচাই|(?:link|url|website).{0,12}(?:check|verify|scam|safe)/u.test(
+      normalized,
+    )
+  ) {
+    return fallback.link;
+  }
+  if (
+    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:screenshot|screenshots|image|images|photo|photos|picture|pictures)|check(?:\s+(?:this|a|the))?\s*(?:screenshot|screenshots|image|images|photo|photos|picture|pictures)|check\s+(?:a\s+)?suspicious\s+(?:screenshot|image|photo)|suspicious\s+(?:screenshot|image|photo)|(?:screenshot|screenshots|image|images|photo|photos|picture|pictures)\s+check)\b|स्क्रीनशॉट|तस्वीर|ছবি|स्क्रिनशट|इमेज|फोटो/u.test(
       normalized,
     )
   ) {
     return fallback.screenshot;
   }
-  if (/\b(email|e-mail)\b|ईमेल|इमेल|ইমেল/u.test(normalized))
-    return fallback.email;
   if (
-    /\b(phone number|phone|caller|call)\b|फ़ोन नंबर|फोन नंबर|फ़ोन|फोन|कॉलर|কলার/u.test(
+    /\b(?:save|add|remember|keep|store)(?:\s+.*)?\b(?:family member|trusted contact|trusted person|contact|mom|mother|dad|father|wife|husband|brother|sister|friend)\b|\b(?:family member|trusted contact|trusted person)\b.*\b(?:save|add|remember|keep|store)\b|(?:save|add|remember|keep|store).{0,18}(?:mother|father|mom|dad|sister|brother|wife|husband|family member|trusted contact)|(?:परिवार|विश्वस्त|भरोसेमंद|संपर्क).{0,30}(?:सहेज|जोड़|रखें|रख|याद)/u.test(
       normalized,
     )
   ) {
-    return fallback.phone;
+    return fallback.saveContact;
   }
-  if (/\b(link|url|website)\b|लिंक|वेबसाइट|ওয়েবসাইট|লিঙ্ক/u.test(normalized))
-    return fallback.link;
   if (
-    /\b(history|previous checks|saved checks)\b|इतिहास|पिछली जाँच|আগের পরীক্ষা|ইতিহাস/u.test(
+    /\b(?:block|remove|delete|ban|stop|ignore).*?(?:number|phone|caller|contact)|(?:number|phone|caller|contact).{0,20}(?:block|remove|delete|ban|stop)|(?:ब्लॉक|मिटाए|हटाएँ|रोकें).{0,20}(?:नंबर|फोन|कॉलर)|(?:ब्लक|মুছে ফেলুন|রাখুন).*?(?:नम্বর|ফোন|কলার)/u.test(
+      normalized,
+    )
+  ) {
+    return fallback.unsupported;
+  }
+  if (
+    /\b(?:lost money|sent money|transferred money|paid scammer|scammer|fraud|cheated|i think i was scammed|i got scammed|money was taken|what should i do if i was scammed|financial cyber fraud)\b|(?:धोखाधड़ी|फ्रॉड|पैसे खोए|पैसा गया|घोटाला|संदिग्ध व्यक्ति).{0,20}|(?:প্রতারণা|ধোকা|টাকা হারানো|টাকা গেছে|স্ক্যাম).{0,20}/u.test(
+      normalized,
+    )
+  ) {
+    return fallback.emergency;
+  }
+  if (
+    /\b(?:how\s+(?:can|do)\s+i\s+check|want\s+to\s+check\s+(?:a\s+)?(?:phone\s*number|phonenumber|number|caller|call)|check(?:\s+(?:this|a|the))?\s*(?:phone\s*number|phonenumber|number|caller|call)|check\s+(?:a\s+)?suspicious\s+(?:phone\s*number|phonenumber|number)|suspicious\s+(?:phone\s*number|phonenumber|number)|(?:phone\s*number|phonenumber|number|caller|call)\s+check|(?:check|verify|is this|is it|could be|looks like|suspicious|fraud|fake|scam).*?(?:phone|number|caller|call)|(?:phone|number|caller|call).{0,25}(?:suspicious|fraud|fake|scam)|(?:check whether|is this).*?(?:phone|number).*?(?:suspicious|scam))\b|(?:संदिग्ध|फर्जी|झूठा|धोखाधड़ी|स्कैम).{0,20}(?:फ़ोन|फोन|नंबर|कॉलर)|(?:स्क्याम|संदেহজনক|फेक|ভুয়া).{0,20}(?:नम্বর|फोन|कलार)/u.test(
+      normalized,
+    )
+  ) {
+    return fallback.phoneCheck;
+  }
+  if (
+    /\b(history|previous checks|saved checks|where can i find.*history|where do i find.*history)\b|इतिहास|पिछली जाँच|আগের পরীক্ষা|ইतিহাস/u.test(
       normalized,
     )
   ) {
@@ -222,7 +282,16 @@ function getFallbackAnswer(question, language) {
   ) {
     return fallback.risk;
   }
-  return "";
+
+  if (
+    /\b(?:thanks|thank you|thank u|good|nice|great|amazing|appreciate it|oh nice|okay|alright|ok)\b|(?:धन्यवाद|शुक्रिया|अच्छा|बहुत अच्छा|ठीक है|बढ़िया|धन्यवाद)|(?:ধন্যবাদ|ভাল|চমৎকার|ঠিক আছে|আচ্ছা)/u.test(
+      normalized,
+    )
+  ) {
+    return fallback.greeting;
+  }
+
+  return undefined;
 }
 
 export { getFallbackAnswer };
@@ -249,7 +318,9 @@ function parseAnswer(content) {
 }
 
 export async function answerAssistantQuestion({ question, language }) {
-  const fallbackAnswer = getFallbackAnswer(question, language);
+  const safeLanguage = FALLBACK_ANSWERS[language] ? language : "en";
+  const safeQuestion = typeof question === "string" ? question.trim() : "";
+  const fallbackAnswer = getFallbackAnswer(safeQuestion, safeLanguage);
   if (fallbackAnswer) return fallbackAnswer;
 
   if (
@@ -257,12 +328,8 @@ export async function answerAssistantQuestion({ question, language }) {
     !process.env.AI_API_URL ||
     !process.env.AI_MODEL
   ) {
-    const error = new Error("The assistant is not configured.");
-    error.status = 503;
-    error.publicCode = "AI_NOT_CONFIGURED";
-    error.publicMessage =
-      "The AI assistant service is not configured. Set AI_API_KEY, AI_API_URL, and AI_MODEL in the backend environment, then restart the backend.";
-    throw error;
+    console.warn("[assistant] AI service not configured for this request.");
+    return DEFAULT_FALLBACKS[safeLanguage];
   }
 
   const controller = new AbortController();
@@ -282,8 +349,8 @@ export async function answerAssistantQuestion({ question, language }) {
           {
             role: "user",
             content: JSON.stringify({
-              language: LANGUAGE_NAMES[language],
-              question: redactSensitiveInput(question).slice(0, 1200),
+              language: LANGUAGE_NAMES[safeLanguage],
+              question: redactSensitiveInput(safeQuestion).slice(0, 1200),
             }),
           },
         ],
@@ -294,21 +361,18 @@ export async function answerAssistantQuestion({ question, language }) {
     });
 
     if (!response.ok) {
-      const error = new Error(`AI provider returned HTTP ${response.status}.`);
-      error.status = response.status === 429 ? 503 : 502;
-      error.publicCode =
-        response.status === 401 || response.status === 403
-          ? "AI_INVALID_CREDENTIALS"
-          : response.status === 429
-            ? "AI_RATE_LIMITED"
-            : "AI_UNAVAILABLE";
-      error.publicMessage =
-        response.status === 401 || response.status === 403
-          ? "The AI service rejected its backend credentials. Check the backend AI_API_KEY and try again."
-          : response.status === 429
-            ? "The AI service is temporarily rate limited. Please wait a moment and try again."
-            : "The AI service could not answer right now. Please try again.";
-      throw error;
+      const statusCode = response.status;
+      const reason =
+        statusCode === 401
+          ? "invalid credentials"
+          : statusCode === 429
+            ? "rate limited"
+            : `HTTP ${statusCode}`;
+      console.warn("[assistant] AI provider rejected the request.", {
+        status: statusCode,
+        reason,
+      });
+      return DEFAULT_FALLBACKS[safeLanguage];
     }
 
     const payload = await response.json();
@@ -319,27 +383,19 @@ export async function answerAssistantQuestion({ question, language }) {
       payload?.result;
     const answer = parseAnswer(content);
     if (!answer || answer.length > 5000) {
-      const error = new Error(
-        "The AI provider returned an invalid assistant response.",
-      );
-      error.status = 502;
-      error.publicCode = "AI_BAD_RESPONSE";
-      error.publicMessage =
-        "The assistant could not answer right now. Please try again.";
-      throw error;
+      console.warn("[assistant] AI provider returned an empty or malformed response.");
+      return DEFAULT_FALLBACKS[safeLanguage];
     }
     return answer;
   } catch (error) {
-    if (error.status) throw error;
-    const providerError = new Error("The AI provider could not be reached.");
-    providerError.status = error.name === "AbortError" ? 504 : 502;
-    providerError.publicCode =
-      error.name === "AbortError" ? "AI_TIMEOUT" : "AI_UNAVAILABLE";
-    providerError.publicMessage =
-      error.name === "AbortError"
-        ? "The AI service took too long to respond. Please try again."
-        : "The AI service could not connect. Check the backend AI_API_URL and network, then try again.";
-    throw providerError;
+    const reason = error instanceof Error ? error.message : "unknown error";
+    const isTimeout =
+      error && typeof error === "object" && "name" in error && error.name === "AbortError";
+    console.warn("[assistant] AI provider call failed.", {
+      type: isTimeout ? "timeout" : "request",
+      reason,
+    });
+    return DEFAULT_FALLBACKS[safeLanguage];
   } finally {
     clearTimeout(timeout);
   }

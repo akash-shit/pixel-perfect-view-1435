@@ -415,6 +415,16 @@ function isEmergencyQuestion(text: string) {
   );
 }
 
+function assistantFallbackMessage(language: UiLanguage) {
+  if (language === "hi") {
+    return "मैं अभी AI सेवा से कनेक्ट करने में थोड़ी समस्या महसूस कर रहा हूँ, लेकिन ScamShield की उपलब्ध सुविधाओं में अभी भी मदद कर सकता हूँ। आप मुझे संदिग्ध संदेश की जाँच, भरोसेमंद संपर्क, पिछली जाँचें, या स्कैम सुरक्षा के बारे में पूछ सकते हैं।";
+  }
+  if (language === "bn") {
+    return "আমি এখন AI সার্ভিসের সাথে সংযোগে সমস্যা অনুভব করছি, কিন্তু ScamShield-এর উপলব্ধ ফিচার নিয়ে এখনও আপনাকে সাহায্য করতে পারি। আপনি আমাকে সন্দেহজনক বার্তা পরীক্ষা, বিশ্বস্ত পরিচিতি, আগের যাচাই, বা স্ক্যাম নিরাপত্তা নিয়ে জিজ্ঞাসা করতে পারেন।";
+  }
+  return "I’m having trouble connecting to my AI service right now, but I can still help with ScamShield’s available features. You can ask me about checking a suspicious message, trusted contacts, your check history, or scam safety.";
+}
+
 function localizedError(error: unknown, copy: (typeof COPY)[UiLanguage]) {
   if (error instanceof ApiError) {
     if (error.status === 0) return copy.networkError;
@@ -708,6 +718,24 @@ export function VoiceAssistant() {
         setSuggestedPath(path);
         setStatus("idle");
       } catch (error) {
+        const responseLanguage = lang;
+        const isAiFailure =
+          error instanceof ApiError &&
+          (error.code?.startsWith("AI_") ||
+            error.status === 0 ||
+            error.status === 429 ||
+            error.status >= 500);
+
+        if (isAiFailure) {
+          setMessages((current) => [
+            ...current,
+            { role: "assistant", text: assistantFallbackMessage(responseLanguage), language: responseLanguage },
+          ]);
+          setRetryQuestion(cleanQuestion);
+          setStatus("idle");
+          return;
+        }
+
         setErrorMessage(localizedError(error, copyRef.current));
         setRetryQuestion(cleanQuestion);
         setStatus("idle");

@@ -61,19 +61,15 @@ test("assistant uses the configured provider and selected language", async (t) =
   });
 });
 
-test("assistant reports missing private AI configuration", async (t) => {
+test("assistant returns a safe fallback when AI configuration is missing", async (t) => {
   withAiEnvironment(t, {});
 
-  await assert.rejects(
-    answerAssistantQuestion({
-      question: "Explain domain squatting with examples.",
-      language: "en",
-    }),
-    (error) =>
-      error.status === 503 &&
-      error.publicCode === "AI_NOT_CONFIGURED" &&
-      /AI_API_KEY, AI_API_URL, and AI_MODEL/.test(error.publicMessage),
-  );
+  const answer = await answerAssistantQuestion({
+    question: "Explain domain squatting with examples.",
+    language: "en",
+  });
+
+  assert.match(answer, /I’m having trouble connecting|ScamShield/);
 });
 
 test("assistant answers common questions in the selected language without AI configuration", async (t) => {
@@ -94,6 +90,31 @@ test("assistant answers common questions in the selected language without AI con
       question: "What is ScamShield?",
       language: "en",
       expected: /ScamShield helps you check suspicious messages/,
+    },
+    {
+      question: "i want to check a msg",
+      language: "en",
+      expected: /Open Check, choose Message/,
+    },
+    {
+      question: "i want to check a link",
+      language: "en",
+      expected: /Open Check and choose Link/,
+    },
+    {
+      question: "i want to check a UPI ID",
+      language: "en",
+      expected: /Open Check and choose the UPI option/,
+    },
+    {
+      question: "i want to check a screenshot",
+      language: "en",
+      expected: /Open Check and choose Screenshot/,
+    },
+    {
+      question: "check this phone number",
+      language: "en",
+      expected: /Phone Number/,
     },
     {
       question: "How can I check a suspicious message?",
@@ -129,4 +150,89 @@ test("assistant answers common questions in the selected language without AI con
       `${example.language} fallback for ${example.question}`,
     );
   }
+});
+
+test("assistant distinguishes trusted contact saving from scam checks", async (t) => {
+  withAiEnvironment(t, {});
+
+  const saveContact = await answerAssistantQuestion({
+    question: "Save my mom's phone number in ScamShield.",
+    language: "en",
+  });
+  assert.match(saveContact, /Family/);
+  assert.doesNotMatch(saveContact, /Open Check and choose Phone Number/i);
+
+  const phoneCheck = await answerAssistantQuestion({
+    question: "Is this phone number suspicious?",
+    language: "en",
+  });
+  assert.match(
+    phoneCheck,
+    /Check and choose Phone Number|check whether a phone number looks suspicious/i,
+  );
+});
+
+test("assistant answers navigation and learning questions based on the real app screens", async (t) => {
+  withAiEnvironment(t, {});
+
+  const historyAnswer = await answerAssistantQuestion({
+    question: "Where do I find my previous checks?",
+    language: "en",
+  });
+  assert.match(historyAnswer, /History/i);
+
+  const learnAnswer = await answerAssistantQuestion({
+    question: "Teach me how phishing works.",
+    language: "en",
+  });
+  assert.match(learnAnswer, /Learn|phishing|warning signs/i);
+
+  const emergencyAnswer = await answerAssistantQuestion({
+    question: "I think I was scammed and lost money.",
+    language: "en",
+  });
+  assert.match(emergencyAnswer, /1930|cybercrime.gov.in|stop replying/i);
+});
+
+test("assistant explains when a direct block or delete action is unsupported", async (t) => {
+  withAiEnvironment(t, {});
+
+  const answer = await answerAssistantQuestion({
+    question: "Block this scam number for me.",
+    language: "en",
+  });
+
+  assert.match(answer, /does not currently offer|built-in call\/message blocking|Family page/i);
+});
+
+test("assistant falls back cleanly on AI configuration and provider errors", async (t) => {
+  withAiEnvironment(t, {
+    AI_API_KEY: "test-key",
+    AI_API_URL: "https://ai.example.test/chat",
+    AI_MODEL: "test-model",
+  });
+
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ error: { message: "bad credentials" } }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+
+  const invalidCredentialsAnswer = await answerAssistantQuestion({
+    question: "Tell me how to use ScamShield.",
+    language: "en",
+  });
+  assert.match(invalidCredentialsAnswer, /I’m having trouble connecting|ScamShield/);
+
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ error: { message: "rate limited" } }), {
+      status: 429,
+      headers: { "Content-Type": "application/json" },
+    });
+
+  const rateLimitedAnswer = await answerAssistantQuestion({
+    question: "Tell me how to use ScamShield.",
+    language: "en",
+  });
+  assert.match(rateLimitedAnswer, /I’m having trouble connecting|ScamShield/);
 });
